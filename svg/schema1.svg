@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <rect x="25" y="25" width="200" height="200" fill="lime" stroke-width="4" stroke="pink" />
+  <circle cx="125" cy="125" r="75" fill="orange" />
+  <polyline points="50,150 50,200 200,200 200,100" stroke="red" stroke-width="4" fill="none" />
+  <line x1="50" y1="50" x2="200" y2="200" stroke="blue" stroke-width="4" />
+
+
+  <g transform="translate(120, 120)">
+    <rect x="0" y="0" width="120" height="120" fill="lime" stroke-width="4" stroke="pink" />
+    <rect x="36" y="24" width="48" height="72" fill="none" stroke-width="1" stroke="black" />
+    <path d="M0,60 l36,0" fill="none" stroke-width="1" stroke="black" />
+    <path d="M84,60 l36,0" fill="none" stroke-width="1" stroke="black" />
+  </g>
+  
+  <g transform="translate(300, 120)">
+    <rect x="0" y="0" width="120" height="120" fill="lime" stroke-width="4" stroke="pink" />
+    <path d="M0,60 l30,0 l60,-20" fill="none" stroke-width="1" stroke="black" />
+    <path d="M90,60 L120,60" fill="none" stroke-width="1" stroke="black" />
+  </g>
+
+  <g transform="translate(450, 120)">
+    <rect x="0" y="0" width="120" height="120" fill="lime" stroke-width="4" stroke="pink" />
+    <circle cx="60" cy="60" r="10" fill="none" stroke-width="1" stroke="black" />
+    <path d="M50,70 l20,-20" fill="none" stroke-width="1" stroke="black" />
+    <path d="M0,60 l50,0" fill="none" stroke-width="1" stroke="black" />
+  </g>
+
+</svg>
