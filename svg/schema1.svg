@@ -4,7 +4,7 @@
 
 <svg xmlns="http://www.w3.org/2000/svg" 
      xmlns:xlink="http://www.w3.org/1999/xlink"
-     width="297mm" height="420mm" viewBox="0 0 2970 4200">
+     height="297mm" width="420mm" viewBox="0 0 4200 2970">
 
   <defs>
     <style type="text/css"><![CDATA[
@@ -74,6 +74,12 @@
       <path d="M90,60 L120,60" />
     </g>
 
+    <g id="terminal-raw" class="component" >
+      <rect class="component-frame" x="0" y="0" width="24" height="24" />
+      <circle cx="12" cy="12" r="10" />
+      <path d="M0,24 L24,0" />
+    </g>
+
     <!-- svorka konecna -->
     <g id="terminal1" class="component">
       <rect class="component-frame" x="0" y="0" width="80" height="120" />
@@ -95,15 +101,25 @@
       <rect class="component-frame" x="0" y="0" width="120" height="120" />
       <path d="M15,85.36 L105,34.64 105,85.36 15,34.64z" />
     </g>
+    
+    <g id="spinac" class="component">
+      <rect class="component-frame" x="0" y="0" width="168" height="120" />
+      <use xlink:href="#contact" x="24" y="0" />
+      <use xlink:href="#terminal-raw" x="144" y="48" />
+      <use xlink:href="#terminal-raw" x="0" y="48" />
+      <path d="M84,50 l0,-20" />
+      <path d="M69,30 l30,0" />
+      
+    </g>
 
 
   </defs>
 
 
   <!-- Ram vykresu -->
-  <rect x="0" y="0" width="2970" height="4200" style="fill:none; stroke:#000000;stroke-width:2px;" />
-  <rect class="bold-line" x="200" y="100" width="2670" height="4000" />
-  <rect x="150" y="50" width="2770" height="4100" style="fill:none; stroke:#000000;stroke-width:0.5mm;" />
+  <rect x="0" y="0" height="2970" width="4200" style="fill:none; stroke:#000000;stroke-width:2px;" />
+  <rect class="bold-line" x="200" y="100" height="2670" width="4000" />
+  <rect x="150" y="50" height="2770" width="4100" style="fill:none; stroke:#000000;stroke-width:0.5mm;" />
   <path d="M1435,50 l0,150" class="bold-line" style="fill:none;" />
   <path d="M1935,50 l0,50" style="fill:none; stroke:#000000;stroke-width:0.5mm;" />
   <path d="M2435,50 l0,50" style="fill:none; stroke:#000000;stroke-width:0.5mm;" />
@@ -114,132 +130,141 @@
   
   <g transform="translate(200, 100)">
 
-    <!-- Linie 1 -->
-    <g transform="translate(120, 300)">
-    
-      <g transform="translate(150,0)">
-        <use xlink:href="#contact" x="0" y="0" />
-        <text class="component" x="20" y="50" style="text-anchor:end;">C8</text>
-        <text class="component" x="100" y="50" style="text-anchor:start;">NO8</text>
-        <text x="60" y="0" style="text-anchor:middle;">QUIDO2</text>
-      </g>
-
-      <path class="mid-line" d="M270,60 l80,0" />
-
-      <g id="part1">
-        <g transform="translate(350,0)">
-          <use xlink:href="#contact" x="0" y="0" />
-        </g>
-
-        <path class="mid-line" d="M470,60 l60,0" />
-
-        <g transform="translate(530,0)">
-          <use xlink:href="#coil-A12" x="0" y="0" />
-          <path class="mid-line dash-line" d="M60,120 l0,120" />
-        </g>
-      </g>
       
-      <g transform="translate(350,0)">
+    <!-- Linie 1 -->
+    <g id="rung1" transform="translate(120, 300)">
+        
+        <g>
+          <text x="0" y="60" style="text-anchor:end;">12V DC</text>
+          <g transform="translate(20,0)">
+            <use xlink:href="#spinac" x="0" y="0" />
+            <g transform="translate(168,0)">
+              <use xlink:href="#contact" x="0" y="0" />
+              <text class="component" x="20" y="50" style="text-anchor:end;">C8</text>
+              <text class="component" x="100" y="50" style="text-anchor:start;">NO8</text>
+              <text x="60" y="0" style="text-anchor:middle;">QUIDO2</text>
+              <g transform="translate(120,0)">
+                <path class="mid-line" d="M0,60 l80,0" />
+                <g transform="translate(80,0)" id="part1">
+                  <use xlink:href="#contact" x="0" y="0" />
+                  <g transform="translate(120,0)">
+                    <path class="mid-line" d="M0,60 l60,0" />
+                    <g transform="translate(60,0)">
+                      <use xlink:href="#coil-A12" x="0" y="0" />
+                      <path class="mid-line dash-line" d="M60,120 l0,120" />
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+    
+      <g transform="translate(390,0)">
         <text class="component" x="20" y="50" style="text-anchor:end;">C1</text>
         <text class="component" x="100" y="50" style="text-anchor:start;">NO1</text>
         <text x="60" y="0" style="text-anchor:middle;">QUIDO1</text>
       </g>
 
-      <g transform="translate(530,0)">
+      <g transform="translate(570,0)">
         <text x="60" y="0" style="text-anchor:middle;">Re1</text>
       </g>
     </g>
     
-    <!-- Linie 2 -->
-    <g transform="translate(120, 470)" >
+    <!-- Linie 2 a 3 -->
+    <g transform="translate(120, 450)" >
 
       <g id="part2">
-        <g transform="translate(510,0)">
-          <text x="0" y="68" style="text-anchor:end;">L1</text>
-        </g>
+        
+          <g transform="translate(470,0)">
+            <text x="0" y="68" style="text-anchor:end;">L1</text>
+          </g>
 
-        <g transform="translate(530,0)">
+          <path class="mid-line" d="M486,60 L570,60" />  
+          <path class="mid-line" d="M516,60 L516,210 L546,210" />
+
+        <g transform="translate(570,0)">
           <use xlink:href="#contact" x="0" y="0" />
         </g>
 
-        <path class="mid-line" d="M650,60 l30,0" />
    
-        <g transform="translate(680,0)">
-          <use xlink:href="#terminal" x="0" y="0" />
-        </g>
+        <path class="mid-line" d="M800,210 l30,0" />
 
-        <path class="mid-line" d="M760,60 l30,0" />
-
-        <g transform="translate(790,0)">
+        <g transform="translate(830,150)">
           <use xlink:href="#valve" x="0" y="0" />
         </g>
 
-        <path class="mid-line" d="M910,60 l30,0" />
+        <path class="mid-line" d="M950,210 l30,0" />
 
-        <g transform="translate(940,0)">
+        <g transform="translate(980,150)">
           <use xlink:href="#terminal" x="0" y="0" />
           <text x="40" y="20" style="text-anchor:middle;">N</text>
         </g>
+        
+        <use xlink:href="#spinac" x="546" y="150" />
+        <path class="mid-line" d="M690,60 l60,0 l0,114 l-36,36" />
+        <path class="mid-line" d="M714,210 l60,0" />
+      
       </g>
-      <g transform="translate(790,0)">
+      <g transform="translate(830,0)">
         <text x="60" y="10" style="text-anchor:middle;">V1</text>
       </g>
-      <g transform="translate(680,0)">
+      <g transform="translate(720,0)">
         <text x="40" y="20" style="text-anchor:middle;">1</text>
       </g>
     </g>
     
-    <path class="mid-line" d="M430,360 l0,1000 l40,0" />
-    <circle cx="430" cy="360" r="7" style="fill:black;" />
+    <path class="mid-line" d="M470,360 l0,1000 l40,0" />
+    <circle cx="470" cy="360" r="7" style="fill:black;" />
     
-    <!-- linie 3 -->
-    <g transform="translate(120, 640)">
+    <!-- linie 4 -->
+    <g transform="translate(120, 750)">
       <use xlink:href="#part1" />
-      <g transform="translate(350,0)">
+      <g transform="translate(390,0)">
         <text class="component" x="20" y="50" style="text-anchor:end;">C2</text>
         <text class="component" x="100" y="50" style="text-anchor:start;">NO2</text>
         <text x="60" y="0" style="text-anchor:middle;">QUIDO1</text>
       </g>
-      <g transform="translate(530,0)">
+      <g transform="translate(570,0)">
         <text x="60" y="0" style="text-anchor:middle;">Re2</text>
       </g>
-      <path class="mid-line" d="M310,60 l40,0" />
-      <circle cx="310" cy="60" r="7" style="fill:black;" />
+      <path class="mid-line" d="M350,60 l40,0" />
+      <circle cx="350" cy="60" r="7" style="fill:black;" />
     </g>
     
-    <!-- Linie 4 -->
-    <g transform="translate(120,810)">
+    <!-- Linie 5, 6 -->
+    <g transform="translate(120,900)">
       <use xlink:href="#part2" />
-      <g transform="translate(790,0)">
+      <g transform="translate(830,0)">
         <text x="60" y="10" style="text-anchor:middle;">V2</text>
       </g>
-      <g transform="translate(680,0)">
+      <g transform="translate(720,0)">
         <text x="40" y="20" style="text-anchor:middle;">2</text>
       </g>
     </g>
     
-    <!-- linie 5 -->
-    <g transform="translate(120, 980)">
+    <!-- linie 7 -->
+    <g transform="translate(120, 1200)">
       <use xlink:href="#part1" />
-      <g transform="translate(350,0)">
+      <g transform="translate(390,0)">
         <text class="component" x="20" y="50" style="text-anchor:end;">C3</text>
         <text class="component" x="100" y="50" style="text-anchor:start;">NO3</text>
         <text x="60" y="0" style="text-anchor:middle;">QUIDO1</text>
       </g>
-      <g transform="translate(530,0)">
+      <g transform="translate(570,0)">
         <text x="60" y="0" style="text-anchor:middle;">Re3</text>
       </g>
-      <path class="mid-line" d="M310,60 l40,0" />
-      <circle cx="310" cy="60" r="7" style="fill:black;" />
+      <path class="mid-line" d="M350,60 l40,0" />
+      <circle cx="350" cy="60" r="7" style="fill:black;" />
     </g>
     
-    <!-- Linie 6 -->
-    <g transform="translate(120,1140)">
+    <!-- Linie 9, 9 -->
+    <g transform="translate(120,1350)">
       <use xlink:href="#part2" />
-      <g transform="translate(790,0)">
+      <g transform="translate(830,0)">
         <text x="60" y="10" style="text-anchor:middle;">V3</text>
       </g>
-      <g transform="translate(680,0)">
+      <g transform="translate(720,0)">
         <text x="40" y="20" style="text-anchor:middle;">3</text>
       </g>
     </g>
@@ -247,4 +272,3 @@
   </g>
 
 
-</svg>
