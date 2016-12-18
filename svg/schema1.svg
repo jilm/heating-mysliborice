@@ -165,7 +165,7 @@
     <path d="M4150,1485 l-100,0" class="bold-line" />
     <!-- Orientacni stredove znacky -->
     <path d="M0,0 L60,34.62 L60,-34.62z" class="mid-line"
-        transform="translate(2840,1485)rotate(180)" />
+        transform="translate(4130,1485)rotate(180)" />
     <!-- Orezove znacky -->
     <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
         style="stroke:none;fill:#000000;" />
@@ -213,9 +213,12 @@
     <path d="M1526.7,-210 l0,140" class="mid-line" />
     <path d="M1133.3,-70 l0,70" class="mid-line" />
     <text x="590" y="50" class="tiny-text">Název</text>
-    <text x="650" y="130" class="mid-text">Topení v RD manželů Lidinských</text>
+    <text x="650" y="130" class="mid-text" >Schema zapojení řídícího systému</text>
+    <text x="250" y="130" class="mid-text" style="text-anchor:middle;">Topení v RD</text>
+    <text x="250" y="220" class="mid-text" style="text-anchor:middle;">manželů</text>
+    <text x="250" y="310" class="mid-text" style="text-anchor:middle;">Lidinských</text>
     <text x="590" y="250" class="tiny-text">Číslo výkresu</text>
-    <text x="650" y="330" class="mid-text">EL01</text>
+    <text x="650" y="330" class="mid-text">RS01</text>
     <text x="1350" y="385" class="tiny-text">List: 01, listů: 99</text>
     <text x="23.3" y="-20" class="tiny-text">Datum: 18.12.2016</text>
     <text x="590" y="-20" class="tiny-text">Navrhl:</text>

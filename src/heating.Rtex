@@ -1,0 +1,784 @@
+\documentclass[]{book}
+
+\usepackage[czech]{babel}
+%\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{pdfpages}
+\usepackage[backend=biber]{biblatex}
+\usepackage{makeidx}
+\addbibresource{heating.bib}
+
+\newcommand{\THH}{$T_1$}
+%\newcommand(\THC}{$T_2$}
+\newcommand{\TRH}{$T_3$}
+\newcommand{\TRC}{$T_4$}
+\newcommand{\SVA}{$\rm SV_1$}
+\newcommand{\SVB}{$\rm SV_2$}
+\newcommand{\DTH}{$\Delta T_H$}
+\newcommand{\DTR}{$\Delta T_R$}
+\newcommand{\FA}{$F_1$}
+\newcommand{\FB}{$F_2$}
+\newcommand{\FC}{$F_3$}
+\newcommand{\degC}[1]{$#1\:\rm ^\circ C$}
+\newcommand{\half}{\,^1\!/_2}
+
+\usepackage[pdftex]{hyperref}
+
+\title{Řízení topení v rodinném domě manželů Lidinských v Myslibořicích}
+\author{Jiří Lidinský}
+\makeindex
+
+\begin{document}
+\frontmatter
+
+\shorthandoff{-} 
+\maketitle
+\tableofcontents
+
+\mainmatter
+
+\chapter{Trocha teorie}
+
+% begin.rcode echo=FALSE
+  ## Základní konstanty
+  library("ggplot2", lib.loc="~/R/win-library/3.3")
+  V <- 30    # The volume of the water reservoar inside the heater [l]
+  c <- 4180  # Merna tepelna kapacita vody
+  Ro <- 1000 # Hustota vody
+  m <- V     # Hmotnost vody ve vymeniku kotle
+
+
+  ## Validate data
+  heat.validate <- function(data, min, max) {
+    data[which(data > max)] <- NaN
+    data[which(data < min)] <- NaN
+    n <- length(data)
+    data[which(abs(data[1:(n-1)] - data[2:n]) > 2)] <- NaN
+    return(data)
+  }
+
+  ## Function to load the data
+  heat.load <- function(filename) {
+    d <- read.csv(filename, header=TRUE, sep=" ")
+    d$heater <- heat.validate(d$heater, 20, 100)
+    d$attic.hot.leg <- heat.validate(d$attic.hot.leg, 18, 60)
+    d$attic.cold.leg <- heat.validate(d$attic.cold.leg, 18, 60)
+    return(d)
+  }
+
+  ## Function to plot the data
+  heat.plot <- function(data) {
+    time = 1:length(data$timestamp)
+    ggplot(data=data) + 
+        geom_line(mapping=aes(x=time, y=heater), col="black") + 
+        geom_line(mapping=aes(x=time, y=attic.hot.leg), col="red") + 
+        geom_line(mapping=aes(x=time, y=attic, col="green")) + 
+        geom_line(mapping=aes(x=time, y=attic.cold.leg), col="blue") +
+        ylab("Temperature [°C]") + xlab("Time [s]")
+  }
+
+% end.rcode
+
+  \section{Teplo}
+
+    Základní vztah mezi teplem a teplotou média:
+    \begin{equation}\label{teplo}
+      Q=mc \Delta T,
+    \end{equation} 
+    kde $m$ je hmotnost, $c$ měrná tepelná kapacita a $\Delta T$
+    je rozdíl počáteční a koncové teploty.
+
+    Pokud tedy zahříváme nádrž s neměnným množstvím vody o hmotnosti $m$,
+    teplotou $T$, ohřívákem o výkonu $P$, pak pro změnu teploty
+    v nádrži platí:
+    \begin{equation}\label{eq:vymenik}
+      P = \frac{dQ}{dt} = mc \frac{dT}{dt}.
+    \end{equation}
+
+    Pokud budeme zahřívat vodu průtočným, topným tělesem o výkonu $P$, dostaneme:
+    \begin{equation}\label{prutok}
+      P = \frac{dQ}{dt} = Fc \Delta T,
+    \end{equation}
+    kde $F=dm/dt$ je hmotnostní průtok a $\Delta T$ je rozdíl teplot na
+    vstupu a výstupu ohřívače.
+
+    Budeme-li mít nádrž s médiem o hmotnosti $m$ a teplotě $T_1$ přes kterou
+    bude protékat médium s hmotnostním průtokem $F=dm/dt$ o teplotě $T_2$
+    dostaneme:
+    \begin{equation}\label{prutok_vymenikem}
+      m \frac{dT_1}{dt} = -T_1 F + T_2 F.
+    \end{equation}
+
+    Pokud budeme nádrž současně zahřívat musíme tento vliv přičíst:
+    \begin{equation}\label{eq:full}
+      mc \frac{dT_1}{dt} = c (T_2 - T_1) F + P.
+    \end{equation}
+
+  \section{Směšovací ventil}
+
+    Výsledná teplota za směšovacím ventilem je rovna váženému průměru
+    vstup\-ních teplot, přičemž váhou je průtok:
+    \begin{equation}\label{eq:sv}
+      T = \frac{F_1 T_1 + F_2 T_2}{F_1 + F_2}.
+    \end{equation}
+
+    Vztah mezi tlakem a průtokem média směšovacím ventilem udává tzv.
+    \index{prů\-to\-kový součinitel} $k_v$  pro který platí:
+    \begin{equation}
+      F= k_v \sqrt {\Delta p \over \Delta p_0},
+    \end{equation}
+    kde $\Delta p_0 = 100\:\rm kPa$. U směšovacích ventilů se v katalogovém
+    listu uvádí jako parametr tzv. $k_{vs}$, což je hodnota $k_v$ při maximálním
+    otevření ventilu. Průtokový součinitel tak může nabývat hodnot z intervalu
+    $K_v \in \langle 0, k_{vs}\rangle$, přitom nula odpovídá úplnému uzavření
+    a $k_{vs}$ odpovídá úplnénu otevření ventilu.
+
+    Míra otevření ventilu se také udává jako tzv. \index{zdvih kuželky}
+    $h\in\langle 0, 1\rangle$. Vztah mezi zdvihem $h$ a průtokovým
+    koeficientem $k_v$ je obecně nelineární $k_v=f(h)$.
+
+\chapter{Hlavní komponenty topení}
+
+  \section{Kotel}
+
+    Použita jsou \index{krbová kamna} HAAS+SOHN typ \index{Tanaga} s výkonem
+    $3{,}5$ -- $15\:\rm kW$, maximální teplota
+    výstupní vody je \degC{80}, doporučený tepelný spád je \degC{75-60}, obsah
+    tepelného výměníku je $29{,}5\:\rm l$. Více viz katalogový list na straně
+    \pageref{apx:kotel}
+
+  \section{Plnící směšovací ventil}
+
+    Pro zabránění kondenzace a tím rezavění kotle je na studené větvi kotle
+    osazen termostatický směšovací ventil ESBE VTC 318, DN 20, \degC{60}.
+    Ventil obsahuje termostat, který začíná otvírat vstup A při teplotě výstupní 
+    (smíchané) vody ve výstupu AB \degC{60}. Když teplota ve vstupu A překročí
+    jmenovitou teplotu o \degC{10}, vstup B je úlně uzavřen.
+    $\rm Kvs = 3{,}2\: m^3\, h^{-1}$. Ventil bude dále v textu označován jako
+    \SVA, zdvih ventilu budu označovat $h_1 \in \langle 0, 1 \rangle$. 
+
+  \section{Směšovací ventil}
+
+    K regulaci teploty do radiátorů je osazen směšovací ventil ESBE VRG 131,
+    DN 20, $\rm Kvs = 6{,}3\: m^3\, h^{-1}$. Ventil bude dále v textu označen
+    jako \SVB, zdvih bude označován jako $h_2 \in \langle 0, 1 \rangle$.
+    Charakteristika ventilu, tedy závislost mezi zdvihem a procentuálním
+    průtokem je dána ve formě grafu. Zdá se, že charakteristiku bude možné
+    aproximovat goniometrickými funkcemi.
+    $$\frac{F}{F_0} = \half + \half \cos\left(\frac{h}{h_0} \pi\right).$$
+
+    Ventil je osazen elektropohonem ESBE ARA 639. Tento pohon otevře z jedné
+    polohy do druhé za 15, 30, 60, 120 s. (TODO nutno ověřit).
+
+  \section{Čerpadlo}
+
+    Je použito čerpadlo Grundfos ALPHA2 L 15-40 130. Vztah mezi tlakem
+    a průtokem je dán ve formě grafu. Zkusme aproximovat charakteristiku
+    polynomem druhého řádu.
+
+    \begin{figure}[hp]
+      \centering
+      % begin.rcode echo=FALSE
+      p <- c(20, 20, 15, 10) * 1000 ## tlak v Pa
+      F <- c(0, 0.2, 1.4, 2.0) * 1000 / 3600 ## prutok v kg / s
+      F2 <- F^2
+      grundfos.q <- lm(p ~ F + F2)
+      grundfos <- list(p, F, q)
+      preasure <- function(flow) {
+        return (grundfos.q$coefficients[1] + 
+          grundfos.q$coefficients[2] * flow + 
+          grundfos.q$coefficients[3] * flow^2)
+      }
+      FF <- (0:100) / 100 * tail(F, 1)
+      pp <- preasure(FF)
+      ggplot() + 
+        geom_point(mapping=aes(x=F, y=p)) +
+        geom_line(mapping=aes(x=FF, y=pp, col="red"))
+      grundfos <- list(p, F, q, preasure) 
+    % end.rcode
+      \caption{Závislost tlaku na průtoku u čerpadel Grundfos ALPHA}
+    \end{figure}
+
+    \begin{equation}
+      p(F) = \rinline{grundfos.q$coefficients[1]} + \rinline{grundfos.q$coefficients[2]} F + \rinline{grundfos.q$coefficients[3]} F^2,
+    \end{equation}
+
+    kde $p$ je tlak v Pa a $F$ je průtok v $\rm kg\, s^{-1}$.
+
+  \section{Radiátory}
+
+    Jsou použity radiátory značky KORADO pravděpodobně typ RADIK KLASIK.
+    Následují vybrané parametry z katalogového listu \cite{radik}. Osazeny
+    jsou čtyři radiátory, o rozměrech uvedených v následující tabulce:
+
+    \begin{table}[hb]
+      \centering
+        \begin{tabular}{cccc}
+          L [mm] & H [mm] & Typ \\
+          \hline
+          2000 & 600 & 21 & Klárča\\
+          2000 & 600 & 21 & Eliška\\
+          1400 & 600 & 21 & Jídelna\\
+          2000 & 600 & 22 & Pokoj
+        \end{tabular}
+      \caption{Rozměry použitých radiátorů}
+    \end{table}
+
+    Následují další vybrané parametry:
+
+    \begin{table}[h]
+      \centering
+        \begin{tabular}{l|r@{,}lr@{,}ll|lr}
+          & Typ 21 & Typ 22\\
+          \hline
+          Jmenovitý tepelný výkon &  1&288    & 1&452   & $\rm kW m^{-1}$\\
+          Teplotní exponent $n$   &  1&3319   & 1&3353  & $\rm -$\\
+          $K_T$                   &  0&033993 & 0&05120 \\
+          $c_0$                   &  1&3505   & 1&3438\\
+          $b$                     &  0&8309   & 0&8055\\
+          $c_1$                   & -0&00002395 & -0&00000514\\
+          Hmotnost tělesa         &  26&4     & 31&1    & $\rm [l m^-1]$\\
+          Vodní objem             &  5&8      & 5&8     & $\rm [l m^-1]$\\
+          Průtokový součinitel    &  1&$\dot 10^{-4}$ & $10^{-4}$ & $A_T$\\
+          Součinitel odporu $\epsilon$ & 8&5 & 8&5\\
+        \end{tabular}
+      \caption{Vybrané paramtery radiátorů}
+    \end{table}
+
+    Více viz katalogový list.
+
+    % begin.rcode 
+      t1 <- c(95, 95, 95, 95, 90, 90, 90, 90, 90, 90, 90, 85, 85, 85, 85, 85, 80, 80, 80, 80, 80, 75, 75, 75, 75, 70, 70, 70, 70, 65, 65, 65, 65, 60, 60, 60, 60, 55, 55, 55, 55, 50, 50, 50, 50, 45, 45, 45, 40, 40)
+      t2 <- c(80, 70, 60, 50, 80, 75, 70, 65, 60, 55, 50, 75, 70, 65, 60, 55, 70, 65, 60, 55, 50, 65, 60, 55, 50, 60, 55, 50, 45, 55, 50, 45, 40, 55, 50, 45, 40, 50, 45, 40, 35, 45, 40, 35, 30, 40, 35, 30, 35, 30)
+      n <- c(0.70, 0.79, 0.91, 1.08, 0.74, 0.78, 0.83, 0.89, 0.96, 1.04, 1.14, 0.82, 0.88, 0.94, 1.01, 1.10, 0.93, 0.99, 1.07, 1.16, 1.28, 1.05, 1.14, 1.24, 1.37, 1.22, 1.33, 1.47, 1.64, 1.43, 1.59, 1.78, 2.05, 1.56, 1.73, 1.94, 2.24, 1.90, 2.15, 2.48, 2.99, 2.40, 2.79, 3.38, 4.39, 3.19, 3.89, 5.11, 4.62, 6.14)
+      t1 <- t1[31:length(t1)]
+      t2 <- t2[31:length(t2)]
+      n <- n[31:length(n)]
+      y <- matrix(n, ncol=1)
+      x <- matrix(t1, ncol=1)
+      x <- cbind(x, t2)
+      x <- cbind(x, 1)
+      a <- solve(t(x) %*% x) %*% t(x) %*% y
+      max(abs(x %*% a - y))
+      x <- cbind(x, t2^2)
+      a <- solve(t(x) %*% x) %*% t(x) %*% y
+      max(abs(x %*% a - y))
+      x <- cbind(x, t1^2)
+      a <- solve(t(x) %*% x) %*% t(x) %*% y
+      max(abs(x %*% a - y))
+      x <- cbind(x, t1*t2)
+      a <- solve(t(x) %*% x) %*% t(x) %*% y
+      max(abs(x %*% a - y))
+    % end.rcode
+
+\chapter{Matematický model}
+
+  Nejjednodušší situace je pro teplotu kotle nižší než \degC{60}.
+  V takovém případě je ventil \SVA otevřen plně na obtokovou větev,
+  takže můžeme napsat, že $T_2 = T_1$ a pro teplotu kotle platí:
+  $$\dot{T}_1(t) = \frac{1}{mc}P_H(t),$$
+  tedy růst teploty kotle je přímo úměrný výkonu kotle.
+
+  Pro teplotu vody v tepelném výměníku kotle platí vztah (\ref{eq:full}).
+  Změna teploty je dána jednak ohřevem a druhak mísením s protékající
+  vodou o teplotě $T_2$.
+  \begin{equation}
+    mc \dot{T}_1(t) = c (T_2(t) - T_1(t)) (F_1(t) + F_2(t)) + P_H(t).
+  \end{equation}
+  Budeme-li předpokládat, že směšovací ventil \SVA udrží teplotu $T_2$ opravdu
+  konstantní a že ani celkový průtok kotlem se nemění, můžeme najít následující
+  řešení diferenciální rovnice:
+  $$T_1(t) = e^{-F/mt}+ T_2+\frac{P_H}{cF},$$
+  kde $F=F_1+F_2$ je celkový průtok kotlem. Je tedy jasné, že po odeznění
+  přechodového děje se $\Delta T_H$ ustálí na teplotě přímo úměrné výkonu
+  kotle $\Delta T_H=P_H/cF$.
+
+  Co když výkon kotle bude mít mírně klesající tendenci? Je asi jasné, že
+  $T_1$ bude klesat, ale průtok kotlem už pravděpodobně nezůstane konstantní.
+  
+
+  Teplota $T_2$ je dána směšováním vody~o teplotě \THH{}~a \TRC{}~v termostatickém
+  směšovacím ventilu \SVA{}.
+  \begin{equation}
+    (F_1(t) + F_2(t)) T_2(t) = F_1(t) T_1(t) + F_2(t) T_4(t).
+  \end{equation}
+  Regulace směšovacího ventilu \SVB{} je jednoduchý proporcionální regulátor:
+  $$y(t) = p(T_1(t) - T_{ref}) = 0{,}1(T_1(t) - 73\:\rm ^\circ C)$$.
+
+  % begin.rcode echo=FALSE
+    y <- function(T1) {
+    result <- 0.1 * (T1 - 73)
+    result <- max(0, result)
+    result <- min(1, result)
+    return(result)
+  }
+  % end.rcode
+
+Je potřeba vzít v úvahu, že rychlost $\dot{h}_2 = dh_2/dt$ otevírání a zavírání ventilu je
+konečná, takže
+
+\begin{equation}
+h_2(t + \Delta t) = \left\{
+  \begin{array}{rl}
+    y(t) & \textrm{pro } y(t) - h_2(t) < \dot{h}_2 \Delta t \\
+    h_2(t) + \textrm{sig}(y(t)-h_2(t)) \dot{h}_2 \Delta t & \textrm{jinak} 
+  \end{array} \right.
+\end{equation}
+
+Otevření termostatického směšovacího ventilu \SVA je dáno teplotou $T_2$.
+
+\begin{equation}
+h_{1\infty}(t) = \left\{
+  \begin{array}{rl}
+    0 & \textrm{pro } T_2(t) < 60\:^\circ\textrm{C},\\
+    0{,}1 T_2(t) - 6 & \textrm{pro } T_2(t) \in \langle 60\:^\circ\textrm{C}, 70\:^\circ\textrm{C}),\\
+    1 & \textrm{pro } T_2(t) \geq 70\:^\circ\textrm{C}
+  \end{array} \right.
+\end{equation}
+
+Opět, rychlost zavírání nebo otvírání ventilu \SVA je konečná a pravděpodobně
+nezanedbatelná.
+
+$$\tau\dot{h}_1(t) = -h_1(t) + h_{1\infty}(t)$$ 
+
+    Vztah mezi tlakem produkovaným čerpadly, a průtokem v obvodu je dán:
+    \begin{eqnarray}
+      \Delta p_1 &=& R_H(F_1 + F_2) + \frac{F_1^2}{K_{v1}^2(h_1)},\\
+      \Delta p_2 &=& R_R(F_3 + F_2) + \frac{F_3^2}{K_{v2}^2(h_2)},\\
+      \Delta p_1 + \Delta p_2 &=& R_H(F_1 + F_2) + \frac{F_2^2}{K_{v2}^2(1-h_2)} +\\
+        &+& R_R(F_2 + F_3) + \frac{F_2^2}{K_{v1}^2(1-h_2)}.
+    \end{eqnarray}
+    Tato soustava rovnic byla odvozena z analogie s elektrickými obvody
+    a nejsem si jist její správností. 
+
+    Díky tomu, že měříme teploty $T_1$, $T_3$ a $T_4$ můžeme dopočítat
+    poměr toků $F_2$ a $F_3$:
+    $$T_3(F_2 + F_3) = T_1 F_2 + T_4 F_3.$$
+
+    Stejná rovnice platí samozřejmě i pro druhý směšovací ventil,
+    bohužel neznáme teplotu $T_2$.
+    $$T_2(F_1 + F_2) = T_1 F_3 + T_4 F_2.$$
+
+    Následující teorie ohledně radiátorů je převzata z \cite{radiator}.
+    Základní vztah pro tepelný výkon:
+    \begin{equation}
+      P = F c \Delta T = k S (T_m - T_r),
+    \end{equation}
+    kde $k$ je součinitel prostupu tepla $\rm [W\, m^{-2}\, K]$,
+    $S$ je vnější přestupní plocha $\rm [m^2]$,
+    $t_m$ je střední teplota vody \degC a
+    $t_r$ je vztažná teplota vzduchu \degC.
+    Toto by byl hrozně fajn vzorec, už proto, že bychom z něj mohli dopočítat
+    výkon radiátorů, bohužel ten součinitel $k$ je zřejmě poměrně složitě
+    závislý na všem možném.
+
+\chapter{Řídící systém}
+
+    \begin{table}
+      \centering
+      \begin{tabular}{ll}
+        Řídící počítač & 192.168.1.90 \\
+        AD4ETH         & 192.168.1.110\\
+        GNOME485       & 192.168.1.111\\
+      \end{tabular}
+      \caption{Síťová konfigurace prvků řídícího systému}
+    \end{table}
+
+    \begin{table}
+      \centering
+      \begin{tabular}{ll}
+        Quido1 & \\
+        Quido2 & \\
+        TQS3   & \\
+        TQS3   & \\
+        DA2    & \\
+        AD4ETH &
+      \end{tabular}
+      \caption{Adresy spinel protokolu jednotlivých prvků}
+    \end{table}
+
+\chapter{Algoritmus}
+
+    V domě jsou dva zdroje tepla a dva vytápěné okruhy. Jednak je osazeno
+    tepelné čerpadlo v přízemí a druhak jsou to krbová kamna v podkroví.
+    Prvním vytápěným okruhem je přízemí kde je podlahové topení a druhým
+    vytápěným okruhem je podkroví kde jsou radiátory. Topení bylo navrženo
+    tak, aby bylo možné vzájemně kombinovat oba zdroje tepla s oběma
+    vytápěními okruhy.
+
+    \begin{table}
+      \centering
+      \begin{tabular}{ccccccccc}
+        $C_1$ & $C_2$ & $C_3$ & $V_1$ & $V_2$ & $V_3$ & $V_4$ & $V_5$ & $V_6$\\
+        \hline
+        on    & on    &       & on    & off   &       & on    & off   & off\\
+        on    & on    & on    & on    & off   & on    & on    & on    & off\\
+              &       & on    &       &       & on    &       & off   & off\\
+        off   & on    & on    & off   & off   & on    & off   & off   & on\\
+        on    & on    &       & on    & on    &       & on    & off   & off\\
+        off   & on    &       & off   & on    &       & on    & off   & off\\
+        off   & on    & off   & off   & off   & off   & off   & off   & on
+      \end{tabular}
+    \end{table}
+
+  \section{Vytápění podkroví krbovými kamny}
+
+  \section{Současné vytápění podkroví a přízemí krbovými kamny}
+
+  \section{Vytápění přízemí tepelným čerpadlem}
+
+  \section{Současné vytápění přízemí a podkroví tepelným čerpadlem}
+
+  \section{Vytápění podkroví tepelným čerpadlem}
+
+\chapter{Analýza naměřených dat}
+
+ \section{Fixní otevření $SV_2$}
+
+    Směšovací ventil $SV_2$ byl ručně nastaven na 75\% otevření větve z
+    radiátoru a 25\% otevření obtoku. Vzorkovací perioda jedna sekunda,
+    celková délka záznamu je asi pět hodin.
+    Teplota kotle postupně klesá, tak jak vyhořívá dřevo v kotli, takže
+    klesá i výkon kotle. Na dalších obrázcích je vidět i klesající 
+    $\Delta T$ na radiátorech a rostoucí poměr průtoků $F_3 / F_2$
+    což znamená, že průtok z kotle klesá na úkor průtoku zpátečky.
+
+    Naměřená teplota kotle se pohybuje od 50 do \degC{60}. Při této teplotě
+    by směšovací ventil \SVA měl do kotle pouštět pouze vodu z obtoku. V tom
+    případě by ale na radiátorech bylo nulové $\Delta T$. Protože ale není
+    napadají mě dvě vysvětlení: (i) termostatický směšovací ventil není zase
+    až tak přesný, (ii) tepelné čidlo ukazuje méně než je teplota kotle.
+
+    \begin{figure}[!hbp]
+      \caption{Naměřená data}
+    % begin.rcode echo=FALSE
+      ##d <- read.csv("161119_heating_hist.r", header=TRUE, sep=" ")
+      d <- heat.load("161119_heating_hist.r")
+      time <- 1:length(d$timestamp)
+      heat.plot(data)
+    % end.rcode
+    \end{figure}
+
+    \begin{figure}[!hbp]
+      \caption[$\Delta T_R$]{Delta $T$ na radiátorech}
+      % begin.rcode echo=FALSE
+        d$DeltaTR <- d$attic.hot.leg - d$attic.cold.leg
+        d$DeltaTR[which(d$DeltaTR < 0)] <- NaN
+        ggplot(data=d) + 
+          geom_line(mapping=aes(x=time, y=DeltaTR), col="black") 
+      % end.rcode
+    \end{figure}
+
+    \begin{figure}[!hbp]
+      \caption[$F_3/F_2$]{Poměr průtoků z kotle vůči průtoku zpátečkou}
+      % begin.rcode echo=FALSE
+        n <- length(d$timestamp)
+        d$F3.F2 <- (d$heater - d$attic.hot.leg) / d$DeltaTR
+        ggplot() + 
+          geom_line(mapping=aes(x=time[500:n], y=d$F3.F2[500:n]), col="black") 
+      % end.rcode
+    \end{figure}
+
+Směšovací ventil SV2 byl otevřený na asi 25 procent. Z grafu v katalogovém
+listu můžeme vyčíst, že průtok $F_2$ by měl být tak 90 procent a průtok
+$F_3$, tedy obtoková větev je 10 procent z celkového průtoku radiátory.
+Z katalogového listu víme, že Kvs ventilu SV2, což chápu jako jakýsi
+parametr \uv{vodivosti} ventilu, je 6,3. Tedy pro pro 
+$KV_2(h_2) = K_{VS2} h_2 = 6,3 x 0,1$. Pro SV2 tedy platí, že
+$F_2=kv2(h_2)\sqrt{\Delta p / \Delta p_0}$ a
+$F_3=kv2(1-h_2)\sqrt{\Delta p / Delta p_0}$.
+
+Z rovnice TODO víme, že
+
+$$\frac{F_1^2}{kv1^2(h_1)} + \frac{F_3^2}{kv2^2(h_2)} = \frac{F_2^2}{kv2^2(1-h_2)} + \frac{F_2^2}{kv1^2(1-h_1)}$$
+
+když rovnici vydělíme $F_2^2$ a trochu přeuspořádáme:
+
+$$\frac{F_1^2}{F_2^2}\frac{1}{kv1^2(h_1)} - \frac{1}{kv1^2(1-h_1)} = \frac{1}{kv2^2(1-h_2)} - \frac{F_3^2}{F_2^2}\frac{1}{kv2^2(h_2)}$$
+
+z rovnice TODO víme, že $F_3 / F_2 = (T_1 - T_3)/\Delta T_R$ a z rovnice TODO
+platí, že $F_1/F_2 = (T_4 - T_2) / (T_2 - T_1)$. Tedy:
+
+$$\frac{(T_4-T_2)^2}{(T_2-T_1)^2}\frac{1}{kv1^2(h_1)} - \frac{1}{kv1^2(1-h_1)} = \frac{1}{kv2^2(1-h_2)} - \frac{(T_1-T_3)^2}{\Delta T_R^2}\frac{1}{kv2^2(h_2)}$$
+
+Dále dosaďme $h_1=7-0,1T_2$, $kv1 = h_1 kvs1$ a $kv_2=kvs2 f(h_2)$
+
+$$\frac{(T_4-T_2)^2}{(T_2-T_1)^2}\frac{1}{kvs1^2 (7-0,1T_2)^2} - \frac{1}{kvs1^2 (0,1T_2-6)^2} = \frac{1}{kvs2^2 f^2(1-h_2)} - \frac{(T_1-T_3)^2}{\Delta T_R^2}\frac{1}{kvs2^2 f^2(h_2)}$$
+
+Nyní máme jednu rovnici pro jednu neznámou, což je $T_2$ a můžeme zkusit
+najít řešení:
+
+
+    \begin{figure}[!hbp]
+    % begin.rcode
+      Kvs1 <- 3.2
+      Kvs2 <- 6.3
+      Kvs12 <- Kvs1 / Kvs2
+      yy <- Kvs12^2 / 0.9^2 - d$F3.F2^2 * Kvs12^2 / 0.1^2
+      f <- function(x, T1, T4, y) (T4 - x)^2 / (x - T1)^2 / (7-0.1*x)^2 - 1/(0.1*x-6)^2 - y
+      rm(T2)
+      T2 <- 0
+      select <- 10000:length(d$timestamp)
+      for (index in select) {
+        T4 <- d$attic.cold.leg[index]
+        T3 <- d$attic.hot.leg[index]
+        T1 <- d$heater[index] + 5
+        y <- Kvs12^2 / 0.9^2 - Kvs12^2*(T1-T3)^2 / (T3-T4)^2 / 0.1^2
+        fmin <- f(60.8, T1, T4, y)
+        fmax <- f(69, T1, T4, y)
+        T2[index - select[1] + 1] <- NaN
+        if (is.finite(fmax*fmin) && (fmax * fmin) < 0) {
+          T2[index - select[1] + 1] <- uniroot(f, c(60.8, 69), T1=T1, T4=T4, y=y)$root
+        }
+      }
+      ggplot() + 
+        geom_line(mapping=aes(x=select, y=T2), col="blue") +
+        geom_line(mapping=aes(x=select, y=d$heater[select] + 20), col="red")
+    % end.rcode
+    \end{figure}
+
+xxx
+
+\chapter{Náhřev kotle}
+
+K analýze používám zaznamenaná data z náhřevu kotle. V záznamu jsou teploty
+horká větev kotle $T_1$, horká větev radiátorů $T_3$ a studená větev
+radiátorů $T_4$. Všechny teploty jsou ve stupních celsia. Vzorkovací
+perioda je jedna sekunda.
+
+Zaznamenaná data z náhřevu kotle mohou být rozdělena do několika fází
+tak jak je patrné z následujícího grafu.
+
+% begin.rcode echo=FALSE
+
+b <- read.csv("heat_up.data", header=TRUE, sep=" ")
+time <- 1:length(b$timestamp)
+select1 <- 200:1100
+select2 <- 1800:3000
+select3 <- 3500:4500
+
+ggplot(data=b) + 
+  annotate("rect", xmin=head(select1, 1), xmax=tail(select1, 1), ymin=10, ymax=80, alpha=0.2, fill="yellow") +
+  annotate("rect", xmin=head(select2, 1), xmax=tail(select2, 1), ymin=10, ymax=80, alpha=0.2, fill="yellow") +
+  annotate("rect", xmin=head(select3, 1), xmax=tail(select3, 1), ymin=10, ymax=80, alpha=0.2, fill="yellow") +
+  geom_line(mapping=aes(x=time, y=attic.hot.leg), col="red") + 
+  geom_line(mapping=aes(x=time, y=heater)) + 
+  geom_line(mapping=aes(x=time, y=attic.cold.leg), col="blue")
+
+% end.rcode
+
+\section{Fáze první, náhřev studeného kotle}
+
+Po zatopení v kotli, díky směšovacímu ventilu $SV_1$, proudí voda pouze vnitřním okruhem kotle.
+Veškeré teplo je tedy spotřebováno na zahřívání vody ve vnitřním tepelném výměníku, o objemu
+$V=\rinline{format(V, decimal.mark=',')}l$. Z grafu je vidět, že teplota vody roste lineárně s časem a vyjdeme-li ze
+vztahu (\ref{eq:vymenik}) pro zahřívání nádrže s vodou:
+
+$$P = mc \frac{dT}{dt}$$
+
+kde $m=\rho V = \rinline{V} kg$, $c=\rinline{c} K kg^{-1} J^{-1}$ je měrná tepelná kapacita
+vody, dostaneme výkon kotle, který je po celou dobu konstantní. 
+$\Delta T / \Delta t$ odečteme z naměřených dat.
+
+% begin.rcode
+q <- lm(b$heater[select1] ~ select1)
+q$coefficients
+% end.rcode
+
+$$\frac{\Delta T}{\Delta t} = \frac{P}{mc} = \rinline{q$coefficients[2]} K s^{-1}$$
+
+% begin.rcode
+P <- as.numeric(q$coefficients[2]) * m * c
+P
+% end.rcode
+
+$$P = \rinline{P} W$$
+
+\section{Fáze druhá, otevírání SV1}
+
+Asi od $60^\circ C$ začíná otevírat směšovací ventil $SV_1$. V naměřených datech je vidět,
+že růst teploty v kotli se zastavil, teplota horké smyčky topení, vystoupala až na
+teplotu kotle a teplota studené smyčky topení pomalu roste, což indikuje vzrůstající průtok
+topením.
+
+% begin.rcode
+ggplot() + 
+  geom_line(mapping=aes(x=select2, y=b$attic.hot.leg[select2]), col="red") + 
+  geom_line(mapping=aes(x=select2, y=b$heater[select2])) + 
+  geom_line(mapping=aes(x=select2, y=b$attic.cold.leg[select2]), col="blue")
+% end.rcode
+
+Výkon kotle se jednak předává do okolí v radiátorech a druhak se zvyšuje teplota
+média v topení. Vím, že teplota studené větve topení se zvyšuje, zatímco teplota
+kotle zůstává zhruba stejná. To znamená, že směšovací ventil $SV_1$ musí otvírat
+a zvyšovat průtok $F_2$ topením. Pokud bychom idealizovali regulační schopnosti
+$SV_1$ a předpokládali, že se mu daří udržet na výstupu těch $60^\circ C$, byl by 
+jasný poměr průtoků z jednotlivých vstupů. Navíc z rovnice (\ref{eq:full})
+můžeme dopočítat průtok $F_1$
+
+$$c T_2 F_1 = P_H \Rightarrow F_1 = \frac{P_H}{c T_2} = \frac{\rinline{P}}{\rinline{c} \times 60} = \rinline{P/c/60} kg s^{-1}$$
+
+Z rovnice pro směšovací ventil (\ref{eq:sv}) by se měl dát dopočítat průtok
+radiátory:
+
+$$T_2 - T_1 = -\frac{F_2}{F_1}\Delta T_R \Rightarrow \Delta T_H = \frac{F_2}{F_1}\Delta T_R \Rightarrow F_2 = \frac{\Delta T_H}{\Delta T_R}F_1$$
+
+% begin.rcode
+F1 <- P/c/60
+DTR <- (b$attic.hot.leg[select2] - b$attic.cold.leg[select2])
+F2 <- (b$attic.hot.leg[select2] - 60)/DTR*F1
+ggplot() + 
+  geom_line(mapping=aes(x=select2, y=F2), col="red")
+% end.rcode
+
+No a když už známe i průtok radiátory, dal by se vypočítat i jejich výkon.
+
+$$P_R = F_2 c \Delta T_R$$
+
+% begin.rcode
+PR = F2 * c * DTR
+ggplot() + 
+  geom_line(mapping=aes(x=select2, y=PR), col="red")
+% end.rcode
+
+Takže předávaný výkon do okolí je při vypnutém čerpadlu $C_2$ minimální.
+
+\section{Fáze třetí, plná konfigurace}
+
+V poslední fázi bylo zapnuto čerpadlo $C_2$ a regulační ventil $SV_2$ byl
+ovládán regulací. Tento děj bude nejsložitější na popis.
+
+Nejprve teploty na směšovacích ventilech:
+
+\begin{eqnarray}
+T_2 F_1 &=& T_1(F_1 - F_2) + T_4 F_2 \Rightarrow \Delta T_H F_1 = (T_1 - T_4) F_2\\
+T_3 F_3 &=& T_1 F_2 + T_4(F_3 - F_2) \Rightarrow \Delta T_R F_3 = (T_1 - T_4) F_2
+\end{eqnarray}
+
+Porovnáním předchozích rovnic dostaneme:
+
+\begin{equation}
+\Delta T_R F_3 = \Delta T_H F_1
+\end{equation}
+
+O směšovacím ventilu $SV_1$ vím toto: při teplotách nižších než je 60 stupňů je
+plně otevřen vnitřní okruh kotle, $h_1 = 0$ a při teplotách vyšších než 70
+stupňů je plně otevřena cesta z radiátorů $h_1 = 1$. Charakteristiku mezi
+těmito teplotami neznám a pro jednoduchost budu předpokládat, že je lineární.
+Otvírání ventilu bude mít nějakou časovou konstantu, kterou sice neznám, ale
+pravděpodobně nebude možné ji zanedbat. Pro ustálený stav, po odeznění přechodového
+děje pro SV1 platí:
+
+$$h_2 = 0.1 T_2 -6; T_2 \in (60, 70)$$
+
+Diferenciální tvar by pak mohl být:
+
+\begin{equation}
+\tau \dot{h}_1 = -h_1 + 0.1 T_2 - 6
+\end{equation}
+
+Podobně to bude se směšovacím ventilem SV2 s tím rozdílem, že o něm mám více
+informací.
+
+\begin{equation}
+mc \dot{T}_1 = - c \Delta T_H F_1 + P_H = - c F_1 T_1 + c F_1 T_2 + P_H   
+\end{equation}
+
+Pokud budu mít k dispozici vektor hodnot: \THH, \TRH, \TRC, \FA, \FB, $h_1$, $h_2$
+měl bych být schopen dopočítat zbylé proměnné:
+
+\begin{eqnarray}
+\Delta T_R &=& T_3 - T_4\\ 
+F_3 &=& F_2 \frac{T_1 - T_4}{\Delta T_R}\\
+T_2 F_1 &=& \frac{T_1(F_1 - F_2) + T_4 F_2}{F_1}\\
+\Delta T_H &=& T_1 - T_2\\
+P_R &=& c F_3 \Delta T_R
+\end{eqnarray}
+
+Dále je potřeba vypočítat predikci pro další krok:
+
+% begin.rcode
+## Najdi prvni minimum horke smycky, dedy misto kdy zacal SV2 otvirat
+hot.leg.min <- min(b$attic.hot.leg[select3])
+hot.leg.min
+index.hot.leg.min <- median(which(hot.leg.min == b$attic.hot.leg[select3]))
+t.hot.leg.min <- select3[index.hot.leg.min] 
+t.hot.leg.min
+select31 <- t.hot.leg.min:tail(select3, 1)
+
+## Najdi maximum horke smycky
+hot.leg.max <- max(b$attic.hot.leg[select31])
+hot.leg.max
+index.hot.leg.max <- median(which(hot.leg.max == b$attic.hot.leg[select31]))
+t.hot.leg.max <- select31[index.hot.leg.max] 
+t.hot.leg.max
+select31 <- t.hot.leg.max:tail(select31, 1)
+
+## Najdi druhe minimum horke smycky, tedy misto kde SV2 zavrel
+hot.leg.min2 <- min(b$attic.hot.leg[select31])
+hot.leg.min2
+index.hot.leg.min2 <- median(which(hot.leg.min2 == b$attic.hot.leg[select31]))
+t.hot.leg.min2 <- select31[index.hot.leg.min2] 
+t.hot.leg.min2
+select31 <- t.hot.leg.min:t.hot.leg.min2
+
+ggplot() + 
+  geom_line(mapping=aes(x=select3, y=b$attic.hot.leg[select3]), col="red") + 
+  geom_line(mapping=aes(x=select3, y=b$heater[select3])) + 
+  geom_line(mapping=aes(x=select3, y=b$attic.cold.leg[select3]), col="blue") +
+  geom_vline(xintercept = t.hot.leg.min) +
+  geom_vline(xintercept = t.hot.leg.min2)
+
+% end.rcode
+
+% begin.rcode
+DTR <- b$attic.hot.leg[select31] - b$attic.cold.leg[select31]
+F23 <- DTR / ((b$heater[select31] + 3) - b$attic.cold.leg[select31])
+ggplot() + 
+  geom_line(mapping=aes(x=select31, y=F23, col="red")) 
+% end.rcode
+
+Výchozí podmínky, kdy začíná otevírat $SV_2$, jsou tyto:
+Teplota kotle: \rinline{b$attic.heater[index.hot.leg.min] + 3}, a protože $SV_2$ je
+téměř zavřený a radiátory neteče voda, a protože ve vnitřním okruhu kotle je
+teplota vyšší než 70 stupňu je zavřený is SV1.
+
+% begin.rcode caching=FALSE
+V
+% end.rcode
+
+
+\appendix
+
+\chapter{Katalogové listy}
+
+\includepdf[pages=1-3]{04-313-17-10-14-01g-tanaga-vymenikem.pdf}/label{apx:kotel}
+
+\section{Katalogový list termostatického směšovacího ventilu VTC 300}
+
+\includepdf[pages=1-2]{VTC_300.pdf}
+
+\section{Směšovací ventil ESBE VRG 131}
+
+\includepdf[pages=1-2]{VRG131_132_133_18.pdf}
+
+\section{Rotační servopohon ESBE ARA 639}
+
+\includepdf[pages=1-5]{rotacni-servopohony-katalog-2015-cz.pdf}
+
+\includepdf[pages=1-28]{grundfos_alpha.pdf}
+
+\section{Radiátory}
+
+\includepdf[pages=18]{radik.pdf}
+\includepdf[pages=45]{radik.pdf}
+\includepdf[pages=47]{radik.pdf}
+\includepdf[pages=65]{radik.pdf}
+
+\backmatter
+
+\printbibliography
+
+\printindex
+
+\end{document}
