@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+ 
+<?xml-stylesheet type="text/css" href="schema.css" ?>
+
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:xi="http://www.w3.org/2001/XInclude"
+     height="297mm" width="420mm" viewBox="0 0 4200 2970">
+
+  <defs xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Civka rele -->
+    <g id="coil" class="component">
+      <rect class="component-frame" x="0" y="0" width="120" height="120"  />
+      <rect x="32" y="18" width="56" height="84" />
+      <path d="M0,60 l32,0" />
+      <path d="M88,60 l32,0" />
+    </g>
+    
+    <!-- -->
+    <g id="coil-A12" class="component">
+      <use xlink:href="#coil" />
+      <text class="component" x="20" y="50" style="text-anchor:end;">A1</text>
+      <text class="component" x="100" y="50" style="text-anchor:start;">A2</text>
+    </g>
+
+    <!-- Spinaci kontakt rele -->
+    <g id="contact" class="component">
+      <rect class="component-frame" x="0" y="0" width="120" height="120" />
+      <path d="M0,60 l30,0 l60,-20" />
+      <path d="M90,60 L120,60" />
+    </g>
+
+    <!-- Prepinaci kontakt rele -->
+    <g id="contact-switch" class="component">
+      <rect class="component-frame" x="0" y="0" width="120" height="120" />
+      <path d="M0,60 l30,0 l60,-20" />
+      <path d="M90,60 L120,60" />
+    </g>
+
+    <g id="terminal-raw" class="component" >
+      <rect class="component-frame" x="0" y="0" width="24" height="24" />
+      <circle cx="12" cy="12" r="10" />
+      <path d="M0,24 L24,0" />
+    </g>
+
+    <!-- svorka konecna -->
+    <g id="terminal1" class="component">
+      <rect class="component-frame" x="0" y="0" width="80" height="120" />
+      <circle cx="40" cy="60" r="10" />
+      <path d="M28,70 l24,-20"  />
+      <path d="M0,60 l30,0" />
+    </g>
+
+    <!-- svorka prubezna -->
+    <g id="terminal" class="component">
+      <rect class="component-frame" x="0" y="0" width="80" height="120" />
+      <circle cx="40" cy="60" r="10" />
+      <path d="M28,70 l24,-20"  />
+      <path d="M0,60 l30,0" />
+      <path d="M50,60 l30,0" />
+    </g>
+    
+    <g id="valve" class="component">
+      <rect class="component-frame" x="0" y="0" width="120" height="120" />
+      <path d="M15,85.36 L105,34.64 105,85.36 15,34.64z" />
+    </g>
+    
+    <g id="spinac" class="component">
+      <rect class="component-frame" x="0" y="0" width="168" height="120" />
+      <use xlink:href="#contact" x="24" y="0" />
+      <use xlink:href="#terminal-raw" x="144" y="48" />
+      <use xlink:href="#terminal-raw" x="0" y="48" />
+      <path d="M84,50 l0,-20" />
+      <path d="M69,30 l30,0" />
+      
+    </g>
+
+
+  </defs>
+
+  <!-- Ram vykresu -->
+  <g>
+    <!-- vnejsi obrys vykresu -->
+    <rect x="0" y="0" height="2970" width="4200" class="thin-line" />
+    <rect x="200" y="50" height="2870" width="3950" class="thin-line" />
+    <!-- Vnitrni ram vykresu -->
+    <rect x="250" y="100" height="2770" width="3850" class="bold-line" />
+    <!-- Stredove znacky -->
+    <path d="M2175,50 l0,100" class="bold-line" />
+    <path d="M2175,2920 l0,-100" class="bold-line" />
+    <path d="M200,1485 l100,0" class="bold-line" />
+    <path d="M4150,1485 l-100,0" class="bold-line" />
+    <!-- Orientacni stredove znacky -->
+    <path d="M0,0 L60,34.62 L60,-34.62z" class="mid-line"
+        transform="translate(4130,1485)rotate(180)" />
+    <!-- Orezove znacky -->
+    <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
+        style="stroke:none;fill:#000000;" />
+    <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
+        style="stroke:none;fill:#000000;"
+	transform="translate(4200,0)rotate(90)" />
+    <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
+        style="stroke:none;fill:#000000;"
+	transform="translate(0,2970)rotate(270)" />
+    <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
+        style="stroke:none;fill:#000000;"
+	transform="translate(4200,2970)rotate(180)" />
+    <!-- Souradnice -->
+    <g id="coordinates-vertical" class="tiny-text" transform="translate(210,360)">
+      <text x="0" y="0" >01</text>
+      <text x="0" y="150" >02</text>
+      <text x="0" y="300" >03</text>
+      <text x="0" y="450" >04</text>
+      <text x="0" y="600" >05</text>
+      <text x="0" y="750" >06</text>
+      <text x="0" y="900" >07</text>
+      <text x="0" y="1050">08</text>
+      <text x="0" y="1200">09</text>
+      <text x="0" y="1350">10</text>
+      <text x="0" y="1500">11</text>
+      <text x="0" y="1650">12</text>
+      <text x="0" y="1800">13</text>
+      <text x="0" y="1950">14</text>
+      <text x="0" y="2100">15</text>
+      <text x="0" y="2250">16</text>
+    </g>
+    <use xlink:href="#coordinates-vertical" x="3900" y="0" />
+  </g>
+
+  <!-- razitko -->
+  <g transform="translate(2400,2470)">
+    <rect x="0" y="0" width="1700" height="400" class="bold-line" />
+    <path d="M566.7,200 1700,200" class="mid-line" />
+    <path d="M566.7,-70 l0,470" class="mid-line" />
+    <path d="M0,-70 l1700,0" class="mid-line" />
+    <path d="M0,-140 l1700,0" class="mid-line" />
+    <path d="M0,-210 l0,210" class="mid-line" />
+    <path d="M176.7,-210 l0,140" class="mid-line" />
+    <path d="M1326.7,-210 l0,140" class="mid-line" />
+    <path d="M1526.7,-210 l0,140" class="mid-line" />
+    <path d="M1133.3,-70 l0,70" class="mid-line" />
+    <text x="590" y="50" class="tiny-text">Název</text>
+    <text x="650" y="130" class="mid-text" >Schema zapojení řídícího systému</text>
+    <text x="250" y="130" class="mid-text" style="text-anchor:middle;">Topení v RD</text>
+    <text x="250" y="220" class="mid-text" style="text-anchor:middle;">manželů</text>
+    <text x="250" y="310" class="mid-text" style="text-anchor:middle;">Lidinských</text>
+    <text x="590" y="250" class="tiny-text">Číslo výkresu</text>
+    <text x="650" y="330" class="mid-text">RS01</text>
+    <text x="1350" y="385" class="tiny-text">List: 01, listů: 99</text>
+    <text x="23.3" y="-20" class="tiny-text">Datum: 18.12.2016</text>
+    <text x="590" y="-20" class="tiny-text">Navrhl:</text>
+    <text x="1156.6" y="-20" class="tiny-text">Schválil:</text>
+    <text x="23.3" y="-90" class="tiny-text">Index</text>
+    <text x="200" y="-90" class="tiny-text">Změna</text>
+    <text x="1350" y="-90" class="tiny-text">Datum</text>
+    <text x="1550" y="-90" class="tiny-text">Schválil</text>
+  </g>
+
+
+  <!-- Plocha vykresu -->
+  
+  <g transform="translate(600, 300)">
+  
+    <text x="-20" y="60" style="text-anchor:end;dominant-baseline:middle;">L1</text>
+    <text x="-20" y="210" style="text-anchor:end;dominant-baseline:middle;">N</text>
+
+    <use xlink:href="#contact" />
+    <text x="60" y="20" style="text-anchor:middle;">-F1</text>
+    <text x="60" y="100" style="text-anchor:middle;">6A</text>
+
+    <path d="M120,60 L300,60" class="mid-line" />
+    <path d="M200,60 L200,510 L300,510" class="mid-line" />
+    <path d="M0,210 L300,210" class="mid-line" />
+    <path d="M80,210 L80,660 L300,660" class="mid-line" />
+    <circle cx="200" cy="60" r="7" style="fill:black;" />
+    <circle cx="80" cy="210" r="7" style="fill:black;" />
+    
+    <g transform="translate(300,0)">
+      <g id="zdroj">
+        <rect x="0" y="0" width="240" height="270" class="mid-line dash-line" />
+        <rect x="70" width="35" height="150" y="60" style="fill:black;" class="mid-line" />
+        <rect x="135" width="35" height="150" y="60" style="fill:black;" class="mid-line" />
+        <path d="M25,60 70,60" class="mid-line" />
+        <path d="M25,210 70,210" class="mid-line" />
+        <path d="M170,210 215,210" class="mid-line" />
+        <path d="M170,60 215,60" class="mid-line" />
+      </g>
+      <text x="120" y="-20" style="text-anchor:middle;">-U2</text>
+      <text x="120" y="310" style="text-anchor:middle;">230V AC/12V DC</text>
+      <text x="120" y="350" style="text-anchor:middle;">230V AC/12V DC</text>
+    </g>
+    
+    <g transform="translate(300,450)">
+      <use xlink:href="#zdroj" x="0" y="0" />
+      <text x="120" y="-20" style="text-anchor:middle;">-U1</text>
+      <text x="120" y="310" style="text-anchor:middle;">230V AC/12V DC</text>
+      <text x="120" y="350" style="text-anchor:middle;">230V AC/12V DC</text>
+    </g>
+    
+    <path d="M540,60 l300,0" class="mid-line" />
+    <text x="860" y="60" style="text-anchor:start;dominant-baseline:middle;">24V DC</text>
+    <g transform="translate(840,60)">
+      <path d="M0,25 l150,0 l43.3,-25 l-43.3,-25 l-150,0z" class="thin-line" />
+    </g>
+    <path d="M540,210 l150,0 l0,300 l-150,0" class="mid-line" />
+    <path d="M690,360 l150,0" class="mid-line" />
+    <text x="860" y="360" style="text-anchor:start;dominant-baseline:middle;">12V DC</text>
+    <g transform="translate(840,360)">
+      <path d="M0,25 l150,0 l43.3,-25 l-43.3,-25 l-150,0z" class="thin-line" />
+    </g>
+    <path d="M540,660 l300,0" class="mid-line" />
+    <text x="860" y="660" style="text-anchor:start;dominant-baseline:middle;">GND</text>
+    <g transform="translate(840,660)">
+      <path d="M0,25 l150,0 l43.3,-25 l-43.3,-25 l-150,0z" class="thin-line" />
+    </g>
+    <circle cx="690" cy="360" r="7" style="fill:black;" />
+
+    
+  </g>
+
+</svg>
