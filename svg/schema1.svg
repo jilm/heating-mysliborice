@@ -1,84 +1,15 @@
 <?xml version="1.0"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+ 
+<?xml-stylesheet type="text/css" href="schema.css" ?>
 
 <svg xmlns="http://www.w3.org/2000/svg" 
      xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:xi="http://www.w3.org/2001/XInclude"
      height="297mm" width="420mm" viewBox="0 0 4200 2970">
 
-  <defs>
-    <style type="text/css"><![CDATA[
-      .bold-line {
-        stroke: #ff0000;
-        stroke-width: 0.7mm;
-        fill: none;
-      }
-      .mid-line {
-        stroke: #000000;
-        stroke-width: 0.5mm;
-        fill: none;
-      }
-      .thin-line {
-        stroke: #000000;
-	stroke-width: 0.25mm;
-	fill: none;
-      }
-      .component {
-        stroke: #000000;
-        stroke-width: 0.5mm;
-        fill: none;
-      }
-      text.component {
-        font-size: 15pt;
-        font-family: sans-serif;
-        fill: black;
-        stroke: none;
-      }
-      .component-frame {
-        stroke: none;
-        stroke-width: 4;
-        fill: none;
-      }
-      text {
-        font-size:20pt;
-        font-family:sans-serif;
-        fill: black;
-        stroke: none;
-      }
-      .tiny-text {
-        font-size: 9mm;
-        font-family: sans-serif;
-        fill: black;
-        stroke: none;
-      }
-      .small-text {
-        font-size: 12mm;
-        font-family: sans-serif;
-        fill: black;
-        stroke: none;
-      }
-      .mid-text {
-        font-size: 17mm;
-        font-family: sans-serif;
-        fill: black;
-        stroke: none;
-      }
-      .big-text {
-        font-size: 25mm;
-        font-family: sans-serif;
-        fill: black;
-        stroke: none;
-      }
-      .huge-text {
-        font-size: 37mm;
-        font-family: sans-serif;
-        fill: black;
-        stroke: none;
-      }
-      .dash-line {
-        stroke-dasharray: 10 10;
-      }
-    ]]></style>
+  <defs xmlns="http://www.w3.org/2000/svg">
 
     <!-- Civka rele -->
     <g id="coil" class="component">
@@ -149,7 +80,6 @@
 
 
   </defs>
-
 
   <!-- Ram vykresu -->
   <g>
@@ -259,7 +189,7 @@
                     <g transform="translate(60,0)">
                       <use xlink:href="#coil-A12" x="0" y="0" />
                       <path class="mid-line dash-line" d="M60,120 l0,120" />
-                      <text x="60" y="0" style="text-anchor:middle;">Re1</text>
+                      <text x="60" y="0" style="text-anchor:middle;">-K1</text>
                     </g>
                   </g>
                 </g>
@@ -325,7 +255,7 @@
                 <g transform="translate(60,0)">
                   <use xlink:href="#coil-A12" x="0" y="0" />
                   <path class="mid-line dash-line" d="M60,120 l0,120" />
-                  <text x="60" y="0" style="text-anchor:middle;">Re2</text>
+                  <text x="60" y="0" style="text-anchor:middle;">-K2</text>
                 </g>
               </g>
             </g>
@@ -386,7 +316,7 @@
                 <g transform="translate(60,0)">
                   <use xlink:href="#coil-A12" x="0" y="0" />
                   <path class="mid-line dash-line" d="M60,120 l0,120" />
-                  <text x="60" y="0" style="text-anchor:middle;">Re3</text>
+                  <text x="60" y="0" style="text-anchor:middle;">-K3</text>
                 </g>
               </g>
             </g>
@@ -447,7 +377,7 @@
                 <g transform="translate(60,0)">
                   <use xlink:href="#coil-A12" x="0" y="0" />
                   <path class="mid-line dash-line" d="M60,120 l0,120" />
-                  <text x="60" y="0" style="text-anchor:middle;">Re4</text>
+                  <text x="60" y="0" style="text-anchor:middle;">-K4</text>
                 </g>
               </g>
             </g>
@@ -508,7 +438,7 @@
                 <g transform="translate(60,0)">
                   <use xlink:href="#coil-A12" x="0" y="0" />
                   <path class="mid-line dash-line" d="M60,120 l0,120" />
-                  <text x="60" y="0" style="text-anchor:middle;">Re5</text>
+                  <text x="60" y="0" style="text-anchor:middle;">-K5</text>
                 </g>
               </g>
             </g>
