@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+ 
+<?xml-stylesheet type="text/css" href="schema.css" ?>
+
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:xi="http://www.w3.org/2001/XInclude"
+     height="297mm" width="420mm" viewBox="0 0 4200 2970">
+
+  <!-- frame -->
+  <g id="_frame_">
+    <!-- vnejsi obrys -->
+    <rect id="_outer_outline_" x="0" y="0" height="2970" width="4200" class="thin-line" />
+    <rect x="200" y="50" height="2870" width="3950" class="thin-line" />
+    <!-- Vnitrni ram vykresu -->
+    <rect x="250" y="100" height="2770" width="3850" class="bold-line" />
+    <!-- Stredove znacky -->
+    <path d="M2175,50 l0,100" class="bold-line" />
+    <path d="M2175,2920 l0,-100" class="bold-line" />
+    <path d="M200,1485 l100,0" class="bold-line" />
+    <path d="M4150,1485 l-100,0" class="bold-line" />
+    <!-- Orientacni stredove znacky -->
+    <path d="M0,0 L60,34.62 L60,-34.62z" class="mid-line"
+        transform="translate(4130,1485)rotate(180)" />
+    <!-- Orezove znacky -->
+    <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
+        style="stroke:none;fill:#000000;" />
+    <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
+        style="stroke:none;fill:#000000;"
+        transform="translate(4200,0)rotate(90)" />
+    <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
+        style="stroke:none;fill:#000000;"
+        transform="translate(0,2970)rotate(270)" />
+    <path d="M0,0 100,0 100,50 50,50 50,50 50,100 0,100z"
+        style="stroke:none;fill:#000000;"
+        transform="translate(4200,2970)rotate(180)" />
+
+  </g>
+
+</svg>
