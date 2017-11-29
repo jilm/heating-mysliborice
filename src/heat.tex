@@ -1,0 +1,249 @@
+\documentclass{book}
+\usepackage[czech]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usepackage{makeidx}
+\usepackage{python}
+
+\makeindex
+\title{heating}
+\author{jlidinsky }
+\date{November 2017}
+
+\begin{document}
+
+\maketitle
+
+\chapter*{Scope}
+
+\chapter{Značení}
+
+    V tomto dokumentu je použito hierarchické značení, které vychází z normy
+    xxx. Označení každého prvku systému může být složeno z několika bloků:
+    i) umístění, ii) funkční celek, iii)druh předmětu, iv) označení svorky, 
+    nebo přípojného místa, v) označení signálu. Označení nemusí obsahovat
+    všechny tyto komponenty, pokud nehrozí nedorozumění nebo pokud to nedává
+    smysl. Každý z bloků označení je uvozen speciálním symbolem.
+
+\section{Umístění}
+
+    Označení umístění se skládá z uvozovacího znaku plus a trojciferného čísla.
+    Přitom první číslice je označení podlaží a druhá číslice specifikuje
+    místnost. Podle podlaží je dům členěn na přízemí a podkroví. Přízemí
+    je označeno číslem jedna a podkroví číslicí dvě. Pokud potřebuji označit
+    něco vně domu je použita číslice nula.
+
+  \begin{table}[]
+    \centering
+    \begin{tabular}{l l}
+      +1.00 & Celé přízemí\\
+      +1.01 & Kuchyně\\
+      +1.02 & Obývací pokoj\\
+      +1.03 & Ložnice I.\\
+      +1.04 & Ložnice II.\\
+      +1.05 & Chodba\\
+      +1.06 & Koupelna\\
+      +1.07 & Záchod\\
+      +1.08 & Prádelna\\
+      +1.09 & Botník\\
+      +1.10 & Zádveří\\
+      +1.11 & Schodiště\\
+      +1.12 & Garáž\\
+      +1.13 & Venkovní prostor vstupních dveří\\
+      +1.14 & Venkovní prostor směrem do zahrady\\
+      \texttt{+200} & celé podkroví\\
+      \texttt{+201} & Ložnice I.\\
+      \texttt{+202} & Ložnice II.\\
+      \texttt{+203} & Kuchyň a jídelna\\
+      \texttt{+204} & Obývací pokoj\\
+      \texttt{+205} & Koupelna\\
+      \texttt{+206} & Schodiště\\
+      \texttt{+207} & Technická místnost
+    \end{tabular}
+    \caption{Označení místností domu}
+    \label{tab:rooms}
+  \end{table}
+
+\section{Funkční celky}
+
+    Označení funkčního celku je uvozeno znakem rovnítka, které je následováno
+    kombinací číslic a písmen. Funkčními celky v rámci tohoto projektu jsou:
+
+\begin{table}[]
+  \centering
+    \begin{tabular}{ l l}
+    \textsf{=KK} & krbová kamna\\
+    =KKA & vnitřní okruh krbových kamen\\
+    =KKB & vnější okruh krbových kamen\\
+    =OT & Soustava otopných těles\\
+    \textsf{=OT1} & Soustava otopných těles v přízemí\\
+    =OT2 & Soustava otopných těles v podkroví\\
+    =HP & Tepelné čerpadlo\\
+    \end{tabular}
+  \caption{Výčet funkčních celků}
+  \label{tab:funkcnicelky}
+\end{table}
+
+\section{Druh předmětu}
+
+    Označení druhu předmětu je uvozeno pomlčkou, která je následována
+    písmenným symbolem a pořadovým číslem, je-li to nutné. 
+
+\section{Označení signálu}
+
+    Signál je uvozen znakem středník, následuje označení fyzikální veličiny
+    a je-li to nutné pak další rozlišovací znaky. Označení fyzikálních veličin
+    se používají následující:
+
+\begin{table}[]
+  \centering
+    \begin{tabular}{l l l}
+$T$ & K & Termodynamická teplota\\
+$t$ & & Teplota ve stupních celsia\\ 
+$\tau$ & s & čas s\\
+$Q$ & J & Teplo J\\
+$U$ & V & Napětí V\\
+$I$ & A &Proud A\\
+$p$ & Pa & tlak\\
+$F$ & $m^3 s^{-1}$ & průtok\\
+$m$ & kg & hmotnost\\
+$ro$ & & hustota\\
+$c$ & & měrná tepelná kapacita\\
+$V$ & & objem m3\\
+    \end{tabular}
+  \caption{Výčet funkčních celků}
+  \label{tab:myfirsttable}
+\end{table}
+
+\section{Výjímky}
+
+    Z důvodu přehlednosti a jednoduchosti mají následující signály a objekty
+    ještě alternativní značení uvedené v tabulce
+
+\begin{table}[]
+  \centering
+    \begin{tabular}{ l l l}
+        \texttt{=KK:H;}$t$\index{$t_1$|see {=KK:H;t}} & $t_1$ & Teplota vody na výstupu z krbových kamen.
+    \end{tabular}
+  \caption{Výčet funkčních celků}
+  \label{tab:myfirsttable}
+\end{table}
+
+\begin{tikzpicture}
+  \draw[thick] (0,0) -- (20.7,0) -- (20.7,12) -- (0,12) -- (0,0);
+  \draw (0,1.5) -- (5.8,1.5) -- (5.8,0) -- (14.05,0) -- (14.05,1.5) -- (20.7,1.5);
+\end{tikzpicture}
+
+\begin{table}[]
+  \centering
+    \begin{tabular}{l l}
+      -A1 & Napájecí rozváděč\\
+      -A2 & Rozváděč s řídícím systémem\\
+      -B1 & Quido RS 8/8 s montáží na lištu DIN\\
+      -B2 & Quido RS 8/8 s montáží na lištu DIN\\
+      -B3 & AD4ETH\\
+      -B4 & DA2RS\\
+      -B5 & GNOME\\
+      -B6 & SENSYCON\\
+      -B7 & JSP\\
+      -BT & TQS3\\
+      -BT & TQS3\\
+      -K1 & Relé\\
+      -K2 & Relé\\
+      -K3 & Relé\\
+      -K4 & Relé\\
+      -K5 & Relé\\
+      -U2 & napájecí zdroj 12V DC\\
+      -U1 & napájecí zdroj 12V DC\\
+      -F1 & jednofázový jistič
+    \end{tabular}
+  \caption{Značení komponent řídícího systému}
+  \label{tab:CSLabels}
+\end{table}
+
+
+\chapter{Řídící systém}
+
+    Řídící systém je realizován běžným počítačm typu PC s OS LINUX, na kterém
+    běží program, který v nekonečné smyčce provádí řídící alogritmus. Program
+    je napsán v jazyce JAVA. Řídící alogoritmus je popsán pomocí textového
+    souboru ve formě vzájemně propojených modulů. Tento je pak interpretován
+    řídícím programem. Při změně řídícího algoritmu tak není potřeba zasahovat
+    do JAVA kódu a poté ho znovu kompilovat. Více o konfiguraci Řídícího
+    viz xxx, o řídícím programu viz xxx a konečně o algoritmu řízení viz xxx.
+
+    Jako vstupy a výstupy do a z techlonogie jsou použity komponenty firmy
+    Papouch, viz xxx. Pro binární vstupy a výstupy jsou použity moduly Quido,
+    pro analogové vstupy je použit modul AD4ETH, pro analogové výstupy je
+    osazen modul DA2RS. Moduly komunikují s řídícím počítačem buďto přímo
+    po síti Ethernet (AD4ETH), nebo jsou do ethernetu připojeny přes převodník
+    komunikační linky RS485 prostřednictvím modulu GNOME485.
+
+    Pro měření teploty jsou osazeny dvě odporová čidla typu pt100, která jsou
+    přes převodník pt100 na proudovou smyčku 4-20mA připojena k analogovým
+    vstupům převodníku AD4ETH. Dále jsou využity polovodičové senzory, které
+    jsou přímo připojeny k modulům Quido. Teplota v podkroví se měří pomocí
+    samostatného modulu papouch xxx a venkovní teplota se měří pomocí modulu
+    papouch xxx.
+
+    Pro regulaci teploty v přízemí je použit termostat ABB xxx. Jeho kontaktní
+    výstup je připojen na binární vstup modulu Quido.
+
+    K řízení směšovacího ventilu SVxxx je použit analogový výstup modulu DA2RS.
+
+    Solenoidové ventily jsou přes oddělovací relé připojeny k výstupům modulu
+    Quido. Stejně tak čerpadla P1--3.
+
+    Ke sběru dat z modulů xxx je použita sériová linka RS485. Ostatní komponenty
+    řídícího systému jsou pak propojeny prostřednictvím komunikační sítě
+    ethernet. IP adresy jsou uvedeny v tabulce xxx
+
+    Spinel adresy modulů jsou uvedeny v tabulce xxx.
+
+    \begin{table}
+      \centering
+      \begin{tabular}{ll}
+        Řídící počítač & 192.168.1.90 \\
+        AD4ETH         & 192.168.1.110\\
+        GNOME485       & 192.168.1.111\\
+      \end{tabular}
+      \caption{Síťová konfigurace prvků řídícího systému}
+    \end{table}
+
+    \begin{table}
+      \centering
+      \begin{tabular}{ll}
+        Quido1 & \\
+        Quido2 & \\
+        TQS3   & \\
+        TQS3   & \\
+        DA2    & \\
+        AD4ETH &
+      \end{tabular}
+      \caption{Adresy spinel protokolu jednotlivých prvků}
+    \end{table}
+
+    Napájení
+
+    \section{Teplota vody na výstupu z krbových kamen}
+
+        Teplotní čidlo s označením =KK-BT\index{=KK-BT}, měří teplotu vody na výstupu
+        z krbových kamen\index{krbová kamna}. Je umístěno na povrchu trubky horké smyčky,
+        co nejblíže ke krbovým kamnům. Jedná se o odporový senzor typu PT100\index{PT100}.
+        Čidlo je připojeno k převodníku Sensycon\index{} s označením -B6\index{-B6},
+        pro převod na proud. Převodník má rozsah xxx. Blokové schema je na následujícím
+        obrázku.
+        
+        \begin{tikzpicture}[scale=1.0]
+
+        \end{tikzpicture}
+        
+    \section{Teplota v přízemí}
+        
+    \section{Teplota v podkroví}
+    
+    \section{Venkovní teplota}
+
+    \printindex
+
+\end{document}
