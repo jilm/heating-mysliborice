@@ -1,0 +1,78 @@
+
+
+class PT100:
+    type = "PT100"
+    short = "Thermistor"
+    label = "BT"
+    
+class P5310:
+    type = "P5310"
+    short = "Temperature Current Converter"
+
+class Quido88:
+    type = 'Quido 8/8'
+    short = 'Binary IOs and temperature measurement'
+    
+class AD4ETH:
+    type = 'AD4ETH'
+    short = 'AD converter with ethernet connection'
+    
+class DA2RS:
+    type = 'DA2RS'
+    short = 'DA converter with RS485'
+    long = """Univerzální převodník s analogovým výstupem při řízení
+              a regulaci. Dva nezávislé analogové výstupy mohou být
+              buď napěťové nebo proudové. Hodnoty pro analogové výstupy
+              zasílá nadřazený systém přes rozhraní RS232 nebo RS485."""
+    gates = {
+        'out1' :
+        'out2' :
+        'comm' :
+        'pwrs' :
+    }
+    
+class GNOME:
+    type = 'GNOME'
+    short = 'RS485 to ETHERNET'
+    
+class SENSYCON:
+    type = 'SENSYCON'
+    short = 'PT100 to current converter'
+    
+class Rele:
+    type = 'Rele'
+    short = 'Rele'
+        
+components = {        
+    
+    # Čidlo pro měření teploty vody na výstupu z kotle
+    '=KK-BTH' : PT100(),
+    
+    '-B3' : P5310(),
+    
+    '+204-BT' : TQS3(
+        spinel_address = 12,
+        
+            
+    ),
+    
+    '+0-BT' : TQS3(
+        ),
+        
+    '-B1' : Quido88(),
+    '-B2' : Quido88(),
+    '-B3' : AD4ETH(),
+    '-B4' : DA2RS(),
+    '-B5' : GNOME(),
+    '-B6' : SENSYCON(),
+    '-B7' : P5310(),
+    '-K1' : Rele(),
+    '-K2' : Rele(),
+    '-K3' : Rele(),
+    '-K4' : Rele(),
+    '-K5' : Rele(),
+}        
+
+
+for c in components:
+    print('{} & {}\\'.format(c, components[c])
