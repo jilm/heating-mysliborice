@@ -66,9 +66,13 @@ def draw_AD_converter():
     draw_converter_base()
     draw_converter_text('A', 'D')
 
-def draw_AD_converter():
-    draw_converter_base()
-    draw_converter_text('A', 'D')
+def draw_triangle_base():
+    """ Just triangle, it is a base for amplifier or comparator """
+    canvas.line((0.8, -6.0), (11.2, 0.0), (0.8, 6.0), (0.8, -6.0))
+    
+def draw_hysteresys_symbol():
+    canvas.line((-2.0, -1.5), (1.0, -1.5), (1.0, 1.5))
+    canvas.line((-1.0, -1.5), (-1.0, 1.5), (2.0, 1.5))
 
 class Component:
     pass
