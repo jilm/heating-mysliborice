@@ -1,105 +1,144 @@
-import functools
+# -*- coding: utf-8 -*-
 
-class Canvas:
-    def __init__(self):
-        self.scale = 1.0
-        self.x_offset = 0.0
-        self.y_offset = 0.0
-        self.frame = None
-    def line(self, coordinates):
-        # transform given coordinates
-        transform = list(((x*self.scale+self.x_offset, y*self.scale+self.y_offset) for x, y in coordinates))
-        # format into string
-        form = ('({},{})'.format(x, y) for x, y in transform)
-        concat = functools.reduce(lambda a, b: '{} -- {}'.format(a, b), form)
-        print('\draw {};'.format(concat))
-    def text(self, text, point):
-        x = point[0]*self.scale+self.x_offset
-        y = point[1]*self.scale+self.y_offset
-        print('\draw ({},{}) node[anchor=south] {{{}}};'.format(x,y,text))
-    def rect(self, x, y, width, height):
-        self.line(((x, y), (x+width, y), (x+width, y+height), (x, y+height), (x, y)))
-    def set_scale(self, scale):
-        self.scale = scale
-    def scale(self, scale):
-        self.scale *= scale
-    def move(self, offset):
-        self.x_offset += offset[0] * self.scale
-        self.y_offset += offset[1] * self.scale
-    def union(self, coordinates):
-        self.frame = ((
-            min((x for x, y in coordinates)),
-            min((y for x, y in coordinates)), (
-            max((x for x, y in coordinates)),
-            max((y for x, y in coordinates))
-        )))
-        print(self.frame)
+import canvas
 
-canvas = Canvas()
-canvas.set_scale(0.075)
+components = {}
+terminals = {}
+connections = list()
 
-def draw_resistor_base():
-    canvas.rect(0.0, -6.0, 4.0, 12.0)
-    canvas.line(((2.0, 6.0), (2.0, 9.0)))
-    canvas.line(((2.0, -6.0), (2.0, -9.0)))
-    
-def draw_thermistor():
-    canvas.line(((0.0, -5.0), (5.0, -5.0), (15.0, 5.0)))
-    canvas.text('$\sigma$', (2.5, -5.0))
-    canvas.move((8.0, 0.0))
-    draw_resistor_base()
-    canvas.move((10.0, 0.0))
-    
-def draw_converter_base():
-    canvas.rect(0.0, -6.0, 12.0, 12.0)
-    canvas.line(((0.0, -6.0), (12.0, 6.0)))
+def register(component):
+    components[component.label] = component
 
-def draw_converter_text(a, b):
-    canvas.text(a, (4.0, 0.0))
-    canvas.text(b, (8.0, -6.0))
-    
-def draw_RI_converter():
-    draw_converter_base()
-    draw_converter_text('R', 'I')
+def register_connection(connection):
+    connections.append(connection)
 
-def draw_AD_converter():
-    draw_converter_base()
-    draw_converter_text('A', 'D')
-
-def draw_triangle_base():
-    """ Just triangle, it is a base for amplifier or comparator """
-    canvas.line((0.8, -6.0), (11.2, 0.0), (0.8, 6.0), (0.8, -6.0))
-    
-def draw_hysteresys_symbol():
-    canvas.line((-2.0, -1.5), (1.0, -1.5), (1.0, 1.5))
-    canvas.line((-1.0, -1.5), (-1.0, 1.5), (2.0, 1.5))
-
-class Component:
+class Gate:
     pass
 
-class Resistor:
-    def __init__(self):
-        pass
-    def draw_block_symbol(self):
-        canvas.rect(-2.0, -6.0, 4.0, 12.0)
-        canvas.line(((0.0, 6.0), (0.0, 9.0)))
-        canvas.line(((0.0, -6.0), (0.0, -9.0)))
-    
-class PT100:
-    def __init__(self):
-        pass
-    def draw_block_symbol(self):
-        Resistor.draw_block_symbol(self)
-        canvas.line(((-10.0, -5.0), (-5.0, -5.0), (5.0, 5.0)))            
-    
+class ResistorGate(Gate):
+    pass
+
+class Component:
+
+    type = 'Component'
+
+    def __init__(self, label):
+        self.label = label
+        register(self)
+
+class PT100(Component):
+
+    type = "PT100"
+    short = "Thermistor"
+    label_base = "BT"
+    terminals = (':1', ':2')
+
+    def __init__(self, label):
+        super().__init__(label)
+
+    def draw_symbol(self):
+        canvas.draw_thermistor()
+        terminals['{}:1'.format(self.label)] = (10.0, 9.0)
+        terminals['{}:2'.format(self.label)] = (10.0, -9.0)
+
 class P5310(Component):
-    def __init__(self):
-        pass
-    def draw_block_symbol(self):
-        canvas.rect(-6.0, -6.0, 12.0, 12.0)
-        canvas.line(((-6.0, -6.0), (12.0, 12.0)))
-        
-draw_thermistor()
-draw_RI_converter()
-canvas.move((20.0, 0.0))
-draw_AD_converter()
+
+    type = 'P5310'
+    manufacturer = 'JSP'
+    short = 'Převodní teplota na proudovou smyčku.'
+    temp_range = (0.0, 60.0)    # rozsah teplot [degC]
+    out_range = (4e-3, 20e-3)   # rozsah výstupních proudů [A]
+    terminals = (':1', ':2', ':3', ':4', ':5', ':6', ':7', ':8')
+    dimensions = (17.0, 62.0, 63.0)  # rozmery [mm]
+
+    def __init__(self, label):
+        super().__init__(label)
+
+    def draw_symbol(self):
+        canvas.draw_RI_converter()
+        terminals['{}:1'.format(self.label)] = (0.0, 2.0)
+        terminals['{}:4'.format(self.label)] = (0.0, -2.0)
+
+class TQS3(Component):
+
+    type = 'TQS3'
+    short = 'Teplotní senzor'
+
+    def __init__(self, label, spinel_address = 256):
+        super().__init__(label)
+        self.spinel_address = spinel_address
+
+class Quido88(Component):
+
+    type = 'Quido 8/8'
+    short = 'Binary IOs and temperature measurement'
+
+    def __init__(self, label, spinel_address):
+        super().__init__(label)
+        self.spinel_address = spinel_address
+
+class AD4ETH(Component):
+
+    type = 'AD4ETH'
+    short = 'AD converter with ethernet connection'
+
+    def __init__(self, label, ip, spinel_address = 256):
+        super().__init__(label)
+
+class DA2RS(Component):
+
+    type = 'DA2RS'
+    short = 'DA converter with RS485'
+
+    def __init__(self, label, spinel_address):
+        super().__init__(label)
+        self.spinel_address = spinel_address
+
+class GNOME485(Component):
+
+    type = 'GNOME'
+    short = 'RS485 to ETHERNET'
+
+    def __init__(self, label, ip):
+        super().__init__(label)
+        self.ip = ip
+
+class SENSYCON(Component):
+
+    type = 'SENSYCON'
+    short = 'PT100 to current converter'
+    temp_range = (0, 100)       # rozsah teplot [degC]
+    out_range = (4e-3, 20e-3)   # rozsah výstupních proudů [A]
+
+    def __init__(self, label):
+        super().__init__(label)
+
+class Rele(Component):
+
+    type = 'Rele'
+    short = 'Rele'
+
+    def __init__(self, label):
+        super().__init__(label)
+
+class PC(Component):
+
+    type = 'PC'
+    short = 'PC'
+
+    def __init__(self, label, ip):
+        super().__init__(label)
+        self.ip = ip
+
+class Wire:
+
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+        register_connection(self)
+
+def draw_connections():
+    for c in connections:
+        if c.a in terminals.keys() and c.b in terminals.keys():
+            canvas.canvas.line((terminals[c.a], terminals[c.b]))
+
