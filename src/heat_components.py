@@ -1,107 +1,223 @@
 # -*- coding: utf-8 -*-
 
-class TQS3:
-    type = 'TQS3'
-    label = 'BT'
-    def __init__(self, spinel_address = 49):
-        pass
+components = {}
 
-class PT100:
+def register(component):
+    components[component.label] = component
+
+class Gate:
+    pass
+    
+class ResistorGate(Gate):
+    pass
+
+class Component:
+    def __init__(self, label):
+        self.label = label
+        register(self)
+
+class PT100(Component):
+    
     type = "PT100"
     short = "Thermistor"
-    label = "BT"
-    def __init__(self, 
-        short_desc = None):
-
-        self.short_desc = short_desc
-        pass
+    label_base = "BT"
+    terminals = (':1', ':2')
     
+    def __init__(self, label):
+        super().__init__(label)        
     
-class P5310:
-    type = "P5310"
-    short = "Temperature Current Converter"
-    # output range: 0-60 stC
+class P5310(Component):
 
-class Quido88:
+    type = 'P5310'
+    manufacturer = 'JSP'
+    short = 'Převodní teplota na proudovou smyčku.'
+    temp_range = (0.0, 60.0)    # rozsah teplot [degC]
+    out_range = (4e-3, 20e-3)   # rozsah výstupních proudů [A]
+    terminals = (':1', ':2', ':3', ':4', ':5', ':6', ':7', ':8')
+    dimensions = (17.0, 62.0, 63.0)  # rozmery [mm]
+
+    def __init__(self, label):
+        super().__init__(label)
+        
+            
+
+class Quido88(Component):
+
     type = 'Quido 8/8'
     short = 'Binary IOs and temperature measurement'
-    def __init__(self, spinel_address = 49):
-        pass
+
+    def __init__(self, label):
+        super().__init__(label)        
     
-class AD4ETH:
+class AD4ETH(Component):
+
     type = 'AD4ETH'
     short = 'AD converter with ethernet connection'
+
+    def __init__(self, label):
+        super().__init__(label)        
     
-class DA2RS:
+class DA2RS(Component):
+
     type = 'DA2RS'
     short = 'DA converter with RS485'
-    long = """Univerzální převodník s analogovým výstupem při řízení
-              a regulaci. Dva nezávislé analogové výstupy mohou být
-              buď napěťové nebo proudové. Hodnoty pro analogové výstupy
-              zasílá nadřazený systém přes rozhraní RS232 nebo RS485."""
-#    gates = {
-#        'out1' :
-#        'out2' :
-#        'comm' :
-#        'pwrs' :
-#    }
+
+    def __init__(self, label):
+        super().__init__(label)        
     
-class GNOME:
+class GNOME(Component):
+
     type = 'GNOME'
     short = 'RS485 to ETHERNET'
+
+    def __init__(self, label):
+        super().__init__(label)        
     
-class SENSYCON:
+class SENSYCON(Component):
+
     type = 'SENSYCON'
     short = 'PT100 to current converter'
-    # output range 0-100 dgC
+    temp_range = (0, 100)       # rozsah teplot [degC]
+    out_range = (4e-3, 20e-3)   # rozsah výstupních proudů [A]
+
+    def __init__(self, label):
+        super().__init__(label)        
     
-class Rele:
+class Rele(Component):
+
     type = 'Rele'
     short = 'Rele'
+
+    def __init__(self, label):
+        super().__init__(label)        
         
-components = {        
+
+# Řídící počítač
+PC(
+    label = '-B10'
+    ip = '192.168.1.90'
+)
     
-    # Čidlo pro měření teploty vody na výstupu z kotle
-    '=KK-BTH' : PT100(
-        short_desc = """Senzor teploty média na výstupu z krbových kamen."""
-    ),
+# Ethernet hub
+Component(
+    label = '-B11'
+)
     
-    '-B3' : P5310(),
+# Čidlo pro měření teploty vody na výstupu z kotle
+PT100(
+    label = '=KK-BTH' 
+)    
+
+# Čidlo pro měření teploty horké vody v přízemí
+PT100(
+    label = '=HP-BTH' 
+)    
+
+
+# Převodník na proudovou smyčku pro PT100 =HP-BTH
+P5310(
+    label = '-B3' 
+    terminals = ()
+)    
     
-    '+204-BT' : TQS3(
-        spinel_address = 12,
-    ),
+# Senzor teploty v obývacím pokoji v podkroví
+TQS3(
+     label =  '+204-BT'
+     spinel_address = 50,
+)
     
-    '+0-BT' : TQS3(
-        ),
+# Senzor venkovní teploty
+TQS3(
+    label = '+0-BT'
+    spinel_address = 51
+)
         
-    '-B1' : Quido88(
-        spinel_address = 0x34 # 34h
-    ),
+# Binární IO, 
+Quido88(
+    label = '-B1'
+    spinel_address = 52
+)
+    
+# Binární IO,
+Quido88(
+    label = '-B2'
+    spinel_address = 53
+),
+    
+# AD převodník, vstup 0: teplota kotle, vstup 1: horká větev v přízemí
+AD4ETH(
+    label = '-B3'
+    spinel_address = 254  
+    ip = '192.168.1.110'  
+)
+    
+# DA převodník pro směšovací ventil
+DA2RS(
+    label = '-B4'
+    spinel_address = 54
+)
+    
+GNOME485(
+    label = '-B5'
+    ip = '192.168.1.111'
+)
+    
+SENSYCON(
+    label = '-B6'
+)
+    
+P5310(
+    label = '-B7'
+)
+    
+Rele('-K1')
+Rele('-K2')
+Rele('-K3')
+Rele('-K4')
+Rele('-K5')
+    
+# Třífázový jistič
+Component('-FA1') 
+    
+# Jednofázový jistič
+Component('-FA2')
+    
+# Skříňka napájení
+Component('-A1')
+   
+# Rozváděč řízení
+Component('-A2')
+    
+# Napájecí zdroj
+Component('-U1')
+    
+# Napájecí zdroj
+Component('-U2')
 
-    '-B2' : Quido88(
-        spinel_address = 0x35 # 35h
-    ),
+Wire('=KK-BTH:1', '-B6:')
+Wire('=KK-BTH:2', '-B6:')
 
-    '-B3' : AD4ETH(),
-    '-B4' : DA2RS(),
-    '-B5' : GNOME(),
-    '-B6' : SENSYCON(),
-    '-B7' : P5310(),
-    '-K1' : Rele(),
-    '-K2' : Rele(),
-    '-K3' : Rele(),
-    '-K4' : Rele(),
-    '-K5' : Rele(),
-    '-K6' : Rele(),
-    '-K7' : Rele(),
-    '-K8' : Rele(),
-    '-K9' : Rele(),
 
-}        
+
+)
+
+signals = {
+
+    # Třífázové napájecí napětí vstupní do jističe FA1
+    ';U400'
+    
+    # Třífázové napájecí napětí za jističem FA1
+    '-FA1;U'
+    
+    # Jednofázové napájecí napětí za jističek FA2
+    '-FA2;U' : ('-FA2:2', '-U1:L', '-U2:L')
+    
+    # Prostě nulák
+    ';N' : ('-U1:N', '-U2:N')
+    
+
+}
 
 
 for c in components:
-    print('{} & {} & {}\\\\'.format(c, components[c].type, components[c].short_desc))
-
-
+    print('{} & {}\\'.format(c, components[c])
