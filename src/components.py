@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import canvas
+import symbols
 
 components = {}
 terminals = {}
@@ -19,6 +20,8 @@ class ResistorGate(Gate):
     pass
 
 class Component:
+    """Common predecessor for each component. Label of each component must
+    be uniqe acros the project."""
 
     type = 'Component'
 
@@ -37,9 +40,47 @@ class PT100(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        canvas.draw_thermistor()
-        terminals['{}:1'.format(self.label)] = (10.0, 9.0)
-        terminals['{}:2'.format(self.label)] = (10.0, -9.0)
+        symbols.draw_thermistor1()
+        terminals['{}:1'.format(self.label)] = canvas.canvas.transform_point((19.0, 5.0))
+        terminals['{}:2'.format(self.label)] = canvas.canvas.transform_point((19.0, -5.0))
+        canvas.canvas.move((30.0, 0.0))
+
+# four wire
+class PT100W4(Component):
+
+    type = "PT100"
+    short = "Thermistor"
+    label_base = "BT"
+    terminals = (':1', ':2', ':3', ':4')
+
+    def __init__(self, label):
+        super().__init__(label)
+
+    def draw_symbol(self):
+        symbols.draw_thermistor()
+        canvas.canvas.line(((10.0, 6.0), (10.0, 18.0), (19.0, 18.0)))
+        canvas.canvas.line(((10.0, -6.0), (10.0, -18.0), (19.0, -18.0)))
+        canvas.canvas.line(((10.0, 6.0), (16.0, 12.0), (19.0, 12.0)))
+        canvas.canvas.line(((10.0, -6.0), (16.0, -12.0), (19.0, -12.0)))
+        terminals['{}:1'.format(self.label)] = canvas.canvas.transform_point((19.0, 18.0))
+        terminals['{}:2'.format(self.label)] = canvas.canvas.transform_point((19.0, 12.0))
+        canvas.canvas.move((30.0, 0.0))
+
+class Terminal(Component):
+
+    type = "PT100"
+    short = "Thermistor"
+    label_base = "BT"
+    terminals = (':1', ':2', ':3', ':4')
+
+    def __init__(self, label):
+        super().__init__(label)
+
+    def draw_symbol(self):
+        canvas.canvas.circle((0.0, 0.0), 1.2)
+        canvas.canvas.line(((-1.2, -1.2), (1.2, 1.2)))
+        pass
+
 
 class P5310(Component):
 
@@ -55,9 +96,14 @@ class P5310(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        canvas.draw_RI_converter()
-        terminals['{}:1'.format(self.label)] = (0.0, 2.0)
-        terminals['{}:4'.format(self.label)] = (0.0, -2.0)
+        canvas.canvas.rect(0.0, -22.0, 18.0, 44.0)
+        canvas.canvas.text(':1', (0.0, 18.0), 'nw')
+        canvas.canvas.text(':2', (0.0, 12.0), 'nw')
+        canvas.canvas.text(':3', (0.0, -12.0), 'nw')
+        canvas.canvas.text(':4', (0.0, -18.0), 'nw')
+        symbols.draw_RI_converter()
+        terminals['{}:1'.format(self.label)] = canvas.canvas.transform_point((0.0, 18.0))
+        terminals['{}:4'.format(self.label)] = canvas.canvas.transform_point((0.0, 12.0))
 
 class TQS3(Component):
 
@@ -84,6 +130,15 @@ class AD4ETH(Component):
 
     def __init__(self, label, ip, spinel_address = 256):
         super().__init__(label)
+
+    def draw_symbol(self):
+        canvas.canvas.text(':1', (0.0, 18.0), 'nw')
+        canvas.canvas.text(':2', (0.0, 12.0), 'nw')
+        canvas.canvas.text(':3', (0.0, -12.0), 'nw')
+        canvas.canvas.text(':4', (0.0, -18.0), 'nw')
+        symbols.draw_AD_converter()
+        terminals['{}:1'.format(self.label)] = canvas.canvas.transform_point((0.0, 18.0))
+        terminals['{}:4'.format(self.label)] = canvas.canvas.transform_point((0.0, 12.0))
 
 class DA2RS(Component):
 
@@ -140,5 +195,7 @@ class Wire:
 def draw_connections():
     for c in connections:
         if c.a in terminals.keys() and c.b in terminals.keys():
-            canvas.canvas.line((terminals[c.a], terminals[c.b]))
+            canvas.canvas.w_line((terminals[c.a], terminals[c.b]))
 
+def begin_line():
+    canvas.canvas.move((0.0, -20.0))

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import components as comp
+import canvas
 
 # Řídící počítač
 comp.PC(
@@ -14,19 +15,19 @@ comp.Component(
 )
 
 # Čidlo pro měření teploty vody na výstupu z kotle
-comp.PT100(
+comp.PT100W4(
     label = '=KK-BTH'
 )
 
 # Čidlo pro měření teploty horké vody v přízemí
-comp.PT100(
+comp.PT100W4(
     label = '=HP-BTH'
 )
 
 
 # Převodník na proudovou smyčku pro PT100 =HP-BTH
 comp.P5310(
-    label = '-B3'
+    label = '-B3',
 )
 
 # Senzor teploty v obývacím pokoji v podkroví
@@ -92,10 +93,10 @@ comp.Component('-FA1')
 comp.Component('-FA2')
 
 # Skříňka napájení
-comp.Component('-A1')
+comp.Component('=A1')
 
 # Rozváděč řízení
-comp.Component('-A2')
+comp.Component('=A2')
 
 # Napájecí zdroj
 comp.Component('-U1')
@@ -106,12 +107,26 @@ comp.Component('-U2')
 comp.Wire('=KK-BTH:1', '-B7:1')
 comp.Wire('=KK-BTH:2', '-B7:4')
 
-for c in sorted(comp.components.keys()):
-    print('{} & {}\\\\'.format(c, comp.components[c].type))
-
-
 comp.components['=KK-BTH'].draw_symbol()
+canvas.canvas.move((0.0, 12.0))
+comp.Terminal(':1').draw_symbol()
+canvas.canvas.text(':10', (-1.2, 0.0), 'nw')
+canvas.canvas.move((0.0, 6.0))
+comp.Terminal(':1').draw_symbol()
+canvas.canvas.text(':9', (-1.2, 0.0), 'nw')
+canvas.canvas.move((0.0, -30.0))
+comp.Terminal(':1').draw_symbol()
+canvas.canvas.text(':11', (-1.2, 0.0), 'nw')
+canvas.canvas.move((0.0, -6.0))
+comp.Terminal(':1').draw_symbol()
+canvas.canvas.text(':12', (-1.2, 0.0), 'nw')
+canvas.canvas.move((0.0, 18.0))
+canvas.canvas.move((20.0, 0.0))
 comp.components['-B7'].draw_symbol()
+canvas.canvas.move((40.0, 0.0))
+comp.components['-B3'].draw_symbol()
+comp.begin_line()
+
+
 comp.draw_connections()
 
-print(comp.connections)
