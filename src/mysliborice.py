@@ -2,6 +2,7 @@
 
 import components as comp
 import canvas
+import symbols
 
 # Řídící počítač
 comp.PC(
@@ -104,28 +105,37 @@ comp.Component('-U1')
 # Napájecí zdroj
 comp.Component('-U2')
 
-comp.Wire('=KK-BTH:1', '-B7:1')
-comp.Wire('=KK-BTH:2', '-B7:4')
+comp.TerminalBlock('+112=A1-X1')
+
+comp.Wire('=KK-BTH:1', '+112=A1-X1:9')
+comp.Wire('=KK-BTH:2', '+112=A1-X1:10')
+comp.Wire('=KK-BTH:3', '+112=A1-X1:11')
+comp.Wire('=KK-BTH:4', '+112=A1-X1:12')
+
+comp.Wire('-B7:1', '+112=A1-X1:9')
+comp.Wire('-B7:2', '+112=A1-X1:10')
+comp.Wire('-B7:3', '+112=A1-X1:11')
+comp.Wire('-B7:4', '+112=A1-X1:12')
+
+comp.Wire('-B3:in1', '-B7:6')
 
 comp.components['=KK-BTH'].draw_symbol()
-canvas.canvas.move((0.0, 12.0))
-comp.Terminal(':1').draw_symbol()
-canvas.canvas.text(':10', (-1.2, 0.0), 'nw')
-canvas.canvas.move((0.0, 6.0))
-comp.Terminal(':1').draw_symbol()
-canvas.canvas.text(':9', (-1.2, 0.0), 'nw')
-canvas.canvas.move((0.0, -30.0))
-comp.Terminal(':1').draw_symbol()
-canvas.canvas.text(':11', (-1.2, 0.0), 'nw')
+canvas.canvas.move((0.0, 18.0))
+comp.components['+112=A1-X1'].draw_symbol(':9')
 canvas.canvas.move((0.0, -6.0))
-comp.Terminal(':1').draw_symbol()
-canvas.canvas.text(':12', (-1.2, 0.0), 'nw')
+comp.components['+112=A1-X1'].draw_symbol(':10')
+canvas.canvas.move((0.0, -24.0))
+comp.components['+112=A1-X1'].draw_symbol(':11')
+canvas.canvas.move((0.0, -6.0))
+comp.components['+112=A1-X1'].draw_symbol(':12')
 canvas.canvas.move((0.0, 18.0))
 canvas.canvas.move((20.0, 0.0))
 comp.components['-B7'].draw_symbol()
-canvas.canvas.move((40.0, 0.0))
+canvas.canvas.move((40.0, -12.0))
 comp.components['-B3'].draw_symbol()
+comp.components['-K1'].draw_symbol()
 comp.begin_line()
+comp.components['-B1'].draw_symbol('o1')
 
 
 comp.draw_connections()

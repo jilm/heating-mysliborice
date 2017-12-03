@@ -41,10 +41,21 @@ class Canvas:
             anchor = ''
         print('\draw ({},{}) node[{}] {{{}}};'.format(x,y,anchor,text))
 
-    def large_text(self, text, point):
+    def large_text(self, text, point, position=None):
         x, y = self.transform_point(point)
-        print('\draw ({},{}) node[anchor=south] {{\large {}}};'.format(x,y,text))
+        if position:
+            anchor = 'anchor={}'.format(text_positions[position])
+        else:
+            anchor = ''
+        print('\draw ({},{}) node[{}] {{\large {}}};'.format(x,y,anchor,text))
 
+    def small_text(self, text, point, position=None):
+        x, y = self.transform_point(point)
+        if position:
+            anchor = 'anchor={}'.format(text_positions[position])
+        else:
+            anchor = ''
+        print('\draw ({},{}) node[{}] {{\small {}}};'.format(x,y,anchor,text))
 
     def rect(self, x, y, width, height):
         self.line(((x, y), (x+width, y), (x+width, y+height), (x, y+height), (x, y)))
