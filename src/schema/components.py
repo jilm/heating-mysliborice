@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import canvas
-import symbols
+from schema.canvas import canvas
+import schema.symbols as sym
 
 components = {}
 terminals = {}
@@ -9,6 +9,9 @@ connections = list()
 
 def register(component):
     components[component.label] = component
+
+def get_component(label):
+    return components[label]
 
 def register_connection(connection):
     connections.append(connection)
@@ -40,10 +43,10 @@ class PT100(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        symbols.draw_thermistor1()
-        terminals['{}:1'.format(self.label)] = canvas.canvas.transform_point((19.0, 5.0))
-        terminals['{}:2'.format(self.label)] = canvas.canvas.transform_point((19.0, -5.0))
-        canvas.canvas.move((30.0, 0.0))
+        canvas.draw_thermistor1()
+        terminals['{}:1'.format(self.label)] = canvas.transform_point((19.0, 5.0))
+        terminals['{}:2'.format(self.label)] = canvas.transform_point((19.0, -5.0))
+        canvas.move((30.0, 0.0))
 
 # four wire
 class PT100W4(Component):
@@ -57,16 +60,16 @@ class PT100W4(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        symbols.draw_thermistor()
-        canvas.canvas.line(((10.0, 6.0), (10.0, 18.0), (19.0, 18.0)))
-        canvas.canvas.line(((10.0, -6.0), (10.0, -18.0), (19.0, -18.0)))
-        canvas.canvas.line(((10.0, 6.0), (16.0, 12.0), (19.0, 12.0)))
-        canvas.canvas.line(((10.0, -6.0), (16.0, -12.0), (19.0, -12.0)))
-        canvas.canvas.text(self.label, (10.0, 24.0), 'n')
-        canvas.canvas.text(self.type, (10.0, -24.0), 's')
-        terminals['{}:1'.format(self.label)] = canvas.canvas.transform_point((19.0, 18.0))
-        terminals['{}:2'.format(self.label)] = canvas.canvas.transform_point((19.0, 12.0))
-        canvas.canvas.move((30.0, 0.0))
+        sym.draw_thermistor()
+        canvas.line(((10.0, 6.0), (10.0, 18.0), (19.0, 18.0)))
+        canvas.line(((10.0, -6.0), (10.0, -18.0), (19.0, -18.0)))
+        canvas.line(((10.0, 6.0), (16.0, 12.0), (19.0, 12.0)))
+        canvas.line(((10.0, -6.0), (16.0, -12.0), (19.0, -12.0)))
+        canvas.text(self.label, (10.0, 24.0), 'n')
+        canvas.text(self.type, (10.0, -24.0), 's')
+        terminals['{}:1'.format(self.label)] = canvas.transform_point((19.0, 18.0))
+        terminals['{}:2'.format(self.label)] = canvas.transform_point((19.0, 12.0))
+        canvas.move((30.0, 0.0))
 
 class Terminal(Component):
 
@@ -79,8 +82,8 @@ class Terminal(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        canvas.canvas.circle((0.0, 0.0), 1.2)
-        canvas.canvas.line(((-1.2, -1.2), (1.2, 1.2)))
+        canvas.circle((0.0, 0.0), 1.2)
+        canvas.line(((-1.2, -1.2), (1.2, 1.2)))
 
 class TerminalBlock(Component):
 
@@ -90,10 +93,10 @@ class TerminalBlock(Component):
         super().__init__(label)
 
     def draw_symbol(self, part):
-        canvas.canvas.circle((0.0, 0.0), 1.2)
-        canvas.canvas.line(((-1.2, -1.2), (1.2, 1.2)))
-        canvas.canvas.small_text(part, (-1.2, 0.0), 'nw')
-        terminals['{}{}'.format(self.label, part)] = canvas.canvas.transform_point((1.2, 0.0))
+        canvas.circle((0.0, 0.0), 1.2)
+        canvas.line(((-1.2, -1.2), (1.2, 1.2)))
+        canvas.small_text(part, (-1.2, 0.0), 'nw')
+        terminals['{}{}'.format(self.label, part)] = canvas.transform_point((1.2, 0.0))
 
 class P5310(Component):
 
@@ -109,23 +112,23 @@ class P5310(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        canvas.canvas.rect(0.0, -22.0, 18.0, 44.0)
-        canvas.canvas.line(((0.0, -22.0), (18.0, 22.0)))
-        canvas.canvas.large_text('R', (6.0, 10.6))
-        canvas.canvas.large_text('I', (12.0, -10.6))
-        canvas.canvas.small_text('1', (0.0, 18.0), 'nw')
-        canvas.canvas.small_text('2', (0.0, 12.0), 'nw')
-        canvas.canvas.small_text('3', (0.0, -12.0), 'nw')
-        canvas.canvas.small_text('4', (0.0, -18.0), 'nw')
-        canvas.canvas.small_text('5', (18.0, 6.0), 'ne')
-        canvas.canvas.small_text('6', (18.0, -6.0), 'ne')
+        canvas.rect(0.0, -22.0, 18.0, 44.0)
+        canvas.line(((0.0, -22.0), (18.0, 22.0)))
+        canvas.large_text('R', (6.0, 10.6))
+        canvas.large_text('I', (12.0, -10.6))
+        canvas.small_text('1', (0.0, 18.0), 'nw')
+        canvas.small_text('2', (0.0, 12.0), 'nw')
+        canvas.small_text('3', (0.0, -12.0), 'nw')
+        canvas.small_text('4', (0.0, -18.0), 'nw')
+        canvas.small_text('5', (18.0, 6.0), 'ne')
+        canvas.small_text('6', (18.0, -6.0), 'ne')
         #symbols.draw_RI_converter()
-        terminals['{}:1'.format(self.label)] = canvas.canvas.transform_point((0.0, 18.0))
-        terminals['{}:2'.format(self.label)] = canvas.canvas.transform_point((0.0, 12.0))
-        terminals['{}:3'.format(self.label)] = canvas.canvas.transform_point((0.0, -12.0))
-        terminals['{}:4'.format(self.label)] = canvas.canvas.transform_point((0.0, -18.0))
-        terminals['{}:5'.format(self.label)] = canvas.canvas.transform_point((18.0, 6.0))
-        terminals['{}:6'.format(self.label)] = canvas.canvas.transform_point((18.0, -6.0))
+        terminals['{}:1'.format(self.label)] = canvas.transform_point((0.0, 18.0))
+        terminals['{}:2'.format(self.label)] = canvas.transform_point((0.0, 12.0))
+        terminals['{}:3'.format(self.label)] = canvas.transform_point((0.0, -12.0))
+        terminals['{}:4'.format(self.label)] = canvas.transform_point((0.0, -18.0))
+        terminals['{}:5'.format(self.label)] = canvas.transform_point((18.0, 6.0))
+        terminals['{}:6'.format(self.label)] = canvas.transform_point((18.0, -6.0))
 
 class TQS3(Component):
 
@@ -147,11 +150,11 @@ class Quido88(Component):
 
     def draw_symbol(self, part):
         if part in ('o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7', 'o8'):
-            geometry = symbols.draw_switch()
-            canvas.canvas.small_text('no{}'.format(part[1]), geometry['pins']['no'][0], 'ne')
-            canvas.canvas.small_text('nc{}'.format(part[1]), geometry['pins']['nc'][0], 'ne')
-            canvas.canvas.small_text('c{}'.format(part[1]), geometry['pins']['comm'][0], 'nw')
-        
+            geometry = sym.draw_switch()
+            canvas.small_text('no{}'.format(part[1]), geometry['pins']['no'][0], 'ne')
+            canvas.small_text('nc{}'.format(part[1]), geometry['pins']['nc'][0], 'ne')
+            canvas.small_text('c{}'.format(part[1]), geometry['pins']['comm'][0], 'nw')
+
 
 
 class AD4ETH(Component):
@@ -163,11 +166,11 @@ class AD4ETH(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        canvas.canvas.small_text(':in1', (0.0, 6.0), 'nw')
-        canvas.canvas.small_text(':gnd', (0.0, -6.0), 'nw')
-        symbols.draw_AD_converter()
-        terminals['{}:in1'.format(self.label)] = canvas.canvas.transform_point((0.0, 6.0))
-        terminals['{}:gnd'.format(self.label)] = canvas.canvas.transform_point((0.0, -6.0))
+        canvas.small_text(':in1', (0.0, 6.0), 'nw')
+        canvas.small_text(':gnd', (0.0, -6.0), 'nw')
+        sym.draw_AD_converter()
+        terminals['{}:in1'.format(self.label)] = canvas.transform_point((0.0, 6.0))
+        terminals['{}:gnd'.format(self.label)] = canvas.transform_point((0.0, -6.0))
 
 class DA2RS(Component):
 
@@ -206,7 +209,7 @@ class Rele(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        geometry = symbols.draw_rele1()
+        geometry = sym.draw_rele1()
 
 class PC(Component):
 
@@ -227,7 +230,7 @@ class Wire:
 def draw_connections():
     for c in connections:
         if c.a in terminals.keys() and c.b in terminals.keys():
-            canvas.canvas.w_line((terminals[c.a], terminals[c.b]))
+            canvas.w_line((terminals[c.a], terminals[c.b]))
 
 def begin_line():
-    canvas.canvas.move((0.0, -20.0))
+    canvas.move((0.0, -20.0))
