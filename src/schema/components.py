@@ -32,6 +32,9 @@ class Component:
         self.label = label
         register(self)
 
+    def get_terminals(self):
+        return ()
+
 class PT100(Component):
 
     type = "PT100"
@@ -148,14 +151,16 @@ class Quido88(Component):
         super().__init__(label)
         self.spinel_address = spinel_address
 
-    def draw_symbol(self, part):
-        if part in ('o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7', 'o8'):
+    def draw_symbol(self, part='all'):
+        if part in ('o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7', 'o8', 'all'):
             geometry = sym.draw_switch()
             canvas.small_text('no{}'.format(part[1]), geometry['pins']['no'][0], 'ne')
             canvas.small_text('nc{}'.format(part[1]), geometry['pins']['nc'][0], 'ne')
             canvas.small_text('c{}'.format(part[1]), geometry['pins']['comm'][0], 'nw')
+            return geometry
 
-
+    def get_terminals(self):
+        return ('c1', 'no1', 'nc1')
 
 class AD4ETH(Component):
 
@@ -209,7 +214,11 @@ class Rele(Component):
         super().__init__(label)
 
     def draw_symbol(self):
-        geometry = sym.draw_rele1()
+        return sym.draw_rele1()
+
+    def get_terminals(self):
+        return ('a1', 'a2', 'c', 'no', 'nc')
+
 
 class PC(Component):
 

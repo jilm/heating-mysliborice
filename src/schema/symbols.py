@@ -20,7 +20,6 @@ def draw_coil_base_lr():
         }
     }
 
-
 def draw_coil_base_ud():
     canvas.rect(0.0, -6.0, 8.0, 12.0)
     return {
@@ -80,7 +79,8 @@ def draw_switch():
     canvas.line(((2*STEP-3.0, 3.0-STEP), (2*STEP-3.0, -1.0*STEP), (2*STEP, -1.0*STEP)))
     return {
         'dim' : ((0.0, -1.0*STEP), (2*STEP, STEP)),
-        'axes' : (STEP, 0.0),
+        'x_axes' : (STEP),
+        'y_axes' : (0.0),
         'pins' : {
             'comm' : ((0.0, 0.0), (-1.0, 0.0)),
             'nc' : ((2*STEP, STEP), (1.0, 0.0)),
@@ -92,10 +92,9 @@ def draw_rele1():
     coil_geom = draw_coil_base_ud()
     canvas.move((0.0, -3.0 * STEP))
     switch_geom = draw_switch()
-
     return {
         'dim' : merge_rects(coil_geom['dim'], switch_geom['dim']),
-        'pins' : {k: v for d in (coil_geom['pins'], switch_geom['pins']) for k, v in d.items()}
+        'pins' : dict({k: v for d in (coil_geom['pins'], switch_geom['pins']) for k, v in d.items()})
     }
 
 def merge_rects(rect1, rect2):
