@@ -14,8 +14,8 @@ def draw_symbol(label):
     term = component.get_terminals()
     term_full = list(('{}:{}'.format(label, t) for t in term))
     print(term_full)
-    conn = (c.a if c.b in term_full else c.b for c in schema.components.connections if c.a in term_full or c.b in term_full)
-    print(list(conn))
+    conn = list(c.a if c.b in term_full else c.b for c in schema.components.connections if c.a in term_full or c.b in term_full)
+    print(conn)
     # choose appropriate coordinates
     # draw the symbol
     geom = component.draw_symbol()
