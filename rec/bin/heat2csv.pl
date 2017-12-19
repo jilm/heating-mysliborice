@@ -4,17 +4,17 @@ while (<>) {
 
         # --- parse ---
 
-        my @signals 
-        foreach my $i (split(/,/,$1)) {
-            my $name, $rest = split(/=/, $i)
-            my $time, $valid, $value = split(/;/, $rest)
+        my @signals;
+        foreach my $ii (split(/,/,$1)) {
+            my $name, $rest = split(/=/, $ii);
+            my $time, $valid, $value = split(/;/, $rest);
             my %signal = (
                 'time' => $time,
                 'valid' => $valid,
                 'value' => $value,
                 'name' => $name                
-            )
-            @signals.push(%signal) 
+            );
+            push(@signals, %signal);
         }
         
         # --- filter ---
@@ -22,6 +22,10 @@ while (<>) {
         # --- sort ---
         
         # --- format ---
+
+        foreach my $s (0 .. $signals) {
+            print($(%signals[$s]){'name'});
+        }
         
     }
 }
