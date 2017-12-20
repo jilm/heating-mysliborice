@@ -1,21 +1,32 @@
+
+my $head = 1;
+my %MONTH_NAMES = ('Dec' => 12);
+
 while (<>) {
 
     if (/\{(.*)\}/) {
 
         # --- parse ---
-
-        my @signals;
-        foreach my $ii (split(/,/,$1)) {
-            my $name, $rest = split(/=/, $ii);
-            my $time, $valid, $value = split(/;/, $rest);
-            my %signal = (
-                'time' => $time,
-                'valid' => $valid,
-                'value' => $value,
-                'name' => $name                
-            );
-            push(@signals, %signal);
+        my $line = $1;
+        my $newLine = 1;
+        if ($head) {
+            print("timestamp");
+            foreach my $ii (split(/,\s?/,$line)) {
+                my ($name, $rest) = split(/=/, $ii);
+                print("; $name");
+            }
+            $head = 0;
+            print("\n");
         }
+        foreach my $ii (split(/,\s?/,$line)) {
+            my ($name, $rest) = split(/=/, $ii);
+            my ($time, $valid, $value) = split(/;/, $rest);
+            my ($weekday, $month, $day, $t, $zone, $year) = split(/\s/, $time);
+            if ($newLine) { print("$day.$MONTH_NAMES{$month}.$year $t") }
+            print("; $value");
+            $newLine = 0;
+        }
+        print("\n");
         
         # --- filter ---
         
@@ -23,9 +34,5 @@ while (<>) {
         
         # --- format ---
 
-        foreach my $s (0 .. $signals) {
-            print($(%signals[$s]){'name'});
-        }
-        
     }
 }
