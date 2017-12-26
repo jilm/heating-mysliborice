@@ -2,18 +2,7 @@
 import re
 import sys
 from datetime import datetime
-
-ARCH_VARIABLES = [
-    {
-        'arch-id': 'outdoor-temp',
-        'arch-file': 'outtemp',
-        'archive': True
-    }, {
-        'arch-id': 'heater-temp',
-        'arch-file': 'heattemp',
-        'archive': True
-    }
-]
+from config import ARCH_VARIABLES
 
 # Read header from the stdin
 head = list([h.strip() for h in sys.stdin.readline().split(',')])
