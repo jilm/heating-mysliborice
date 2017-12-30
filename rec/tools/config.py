@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import pathlib
+
 ARCH_DIR = '/cygdrive/C/Users/jilm/Documents/heating-mysliborice/rec/arch/'
+WORK_DIR = '/cygdrive/C/Users/jilm/Documents/heating-mysliborice/rec/work/'
+ARCH_PATH = pathlib.Path(ARCH_DIR)
+WORK_PATH = pathlib.Path(WORK_DIR)
 
 ARCH_VARIABLES = [
 
@@ -182,3 +187,17 @@ ARCH_VARIABLES = [
 
 ]
 
+def data_from_file(filename):
+    with open(filename, 'r') as f:
+        yield f.readline()
+
+PLOTS = {
+
+    'outdoor-temp': {
+
+        'title': 'Venkovní teplota',
+        'daq': lambda x: data_from_file('outdoor-temp')
+
+
+    }
+}
