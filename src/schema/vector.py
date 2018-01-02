@@ -25,8 +25,8 @@ class Transform:
     def move_to(self, point):
         self.x_offset, self.y_offset = point
 
-
 class Rect:
+
     """ A rectangle which is parallel to coordinate axes. """
 
     def __init__(self, points):
@@ -59,11 +59,17 @@ class Rect:
             self.corners[0][0], self.corners[1][1] - self.corners[0][1]
 
     def get_points(self):
-        pass
+        return self.corners
 
     def get_path(self):
+
         """ Return a rectagle in the form of path to draw. """
+
         x1, y1 = self.corners[0]
         x2, y2 = self.corners[1]
         return [(x1, y1), (x2, y1), (x2, y2), (x1, y2), (x1, y1)]
 
+def get_rect(width, height = None):
+    if not height:
+        heigt = width
+    return Rect(

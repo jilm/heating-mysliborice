@@ -16,13 +16,13 @@ CROSS_LINE = ((-CROSS_LINE_SIZE, -CROSS_LINE_SIZE), (CROSS_LINE_SIZE, CROSS_LINE
 
 def draw_thermistor_block():
     # draw rectangle
-    canvas.draw_line(RECT.get_points())
+    canvas.line(RECT.get_points())
     # draw pins
     # draw variable symbol
-    canvas.draw_line(CROSS_LINE)
+    canvas.line(CROSS_LINE)
     # draw theta letter
     canvas.text('$\sigma$', (2.5, -5.0))
     # draw envelope rectangle 
-    canvas.draw_line(vector.Rect())
+    canvas.line(vector.Rect())
     
  
