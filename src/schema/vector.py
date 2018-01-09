@@ -50,6 +50,16 @@ class Transform:
         result.y0 = self.y0 + y
         return result
 
+    def r_move(self, x, y):
+        result = Transform()
+        result.a11 = self.a11
+        result.a12 = self.a12
+        result.x0 = self.a11 * x + self.a12 * y + self.x0
+        result.a21 = self.a21
+        result.a22 = self.a22
+        result.y0 = self.a21 * x + self.a22 * y + self.y0
+        return result
+
     def rotate_vect(self):
         result = Transform()
         result.a11 = self.a21
@@ -80,6 +90,9 @@ class Transform:
         result.a22 = tr.a21 * self.a12 + tr.a22 * self.a22
         result.y0 = tr.a21 * self.x0 + tr.a22 * self.y0 + tr.y0
         return result
+
+    def get_offset(self):
+        return self.x0, self.y0
 
     def __str__(self):
         return '\n'.join((
