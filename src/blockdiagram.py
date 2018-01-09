@@ -38,50 +38,61 @@ triangle = Line(Transform().scale(0.70).transform_points(EQ_TRIANGLE))
 
 # Krbova kamna
 def write_heater(canvas, transf = I):
-    transf = I.scale(3.0, 4.0).transform(transf)
-    symbol = Square(transf)
+    t = I.scale(3.0, 4.0).transform(transf)
+    symbol = Square(t)
     symbol.write(canvas)
-    return [
-        transf.move((3.0, 1.5))
-    ]
+    return transf.move(transf.transform_vector((3.0, 0.0)))
 
 def write_pump(canvas, transf = I):
     symbol = Circle(transf)
     symbol.write(canvas)
-    return transf.move((1.5, 0.0))
+    t = I.scale(-0.6, 0.6).transform(transf)
+    symbol = Line(EQ_TRIANGLE, t)
+    symbol.write(canvas)
+    return transf.move(transf.transform_vector((1.5, 0.0)))
 
 def write_mix_valve(canvas, transf = I):
     symbol = Line(MIX_VALVE, transf)
     symbol.write(canvas)
-    return transf.move((1.5, 0.0))
+    t1 = transf.move(transf.transform_vector((1.5, 0.0)))
+    t2 = transf.rotate_vect()
+    t2 = t2.move(t2.transform_vector((1.5, 0.0)))
+    return t1, t2
 
 def write_corner(canvas, transf = I):
     symbol = Line(((-0.5, 0.0), (0.0, 0.0), (0.0, -0.5)), transf)
     symbol.write(canvas)
-    return transf.rotate_vect().move((1.5, 0.0))
+    transf = transf.rotate_vect()
+    return transf.move(transf.transform_vector((1.5, 0.0)))
 
+def write_radiator(canvas, transf = I):
+    symbol = Square(I.scale(3.0, 4.0).transform(transf))
+    symbol.write(canvas)
+    return transf.move(transf.transform_vector((4.0, 0.0)))
 
-# Schematicky blokovy diagram topeni v podkrovi
-
-# Krbova kamna
-
-# Cerpadlo krbovych kamen
-
-# Termostaticky regulacni ventil
-
-# Smesovaci ventil
-
-# Cerpadlo do topeni
-
-# Topeni
-
+def write_tee(canvas, t1, t2):
+    p1x, p1y = t1.transform_point((0.0, 0.0))
+    v1x, v1y = t1.transform_vector((-1.0, 0.0))
+    p2x, p2y = t2.transform_point((0.0, 0.0))
+    v2x, v2y = t2.transform_vector((-1.0, 0.0))
+    ox = p1x * v2x + p2x * v1x
+    oy = p1y * v2y + p2y * v1y
+    t = t1.move_to((ox, oy))
+    symbol = Line(((-0.5, 0.0), (0.5, 0.0), (0.0, 0.0), (0.0, -0.5)), t)
+    symbol.write(canvas)
+    return t.move(t.transform_vector((1.5, 0.0)))
 
 # Nakresli
 canvas = Canvas()
 transform = I
+transform, t2 = write_mix_valve(canvas, transform)
 transform = write_pump(canvas, transform)
-transform = write_mix_valve(canvas, transform)
 transform = write_corner(canvas, transform)
-transform = write_mix_valve(canvas, transform)
-
-
+transform = write_radiator(canvas, transform)
+transform = write_corner(canvas, transform)
+transform = write_tee(canvas, transform, t2)
+transform, t2 = write_mix_valve(canvas, transform)
+transform = write_pump(canvas, transform)
+transform = write_corner(canvas, transform)
+transform = write_heater(canvas, transform)
+transform = write_corner(canvas, transform)
