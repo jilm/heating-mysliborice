@@ -39,6 +39,17 @@ class Transform:
         result.y0 = y_scale * self.y0
         return result
 
+    def r_scale(self, x_scale, y_scale = None):
+        if y_scale is None: y_scale = x_scale
+        result = Transform()
+        result.a11 = x_scale * self.a11
+        result.a12 = y_scale * self.a12
+        result.x0 = self.x0
+        result.a21 = x_scale * self.a21
+        result.a22 = y_scale * self.a22
+        result.y0 = self.y0
+        return result
+
     def move(self, vector):
         x, y = vector
         result = Transform()

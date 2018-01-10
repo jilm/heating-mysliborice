@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import schema.components as comp
-import schema.canvas
-import schema.symbols
-
-from schema.utils import *
 
 # Řídící počítač
 comp.PC(
@@ -120,27 +116,3 @@ comp.Wire('-B7:3', '+112=A1-X1:11')
 comp.Wire('-B7:4', '+112=A1-X1:12')
 
 comp.Wire('-B3:in1', '-B7:6')
-
-comp.components['=KK-BTH'].draw_symbol()
-move((0.0, 18.0))
-comp.components['+112=A1-X1'].draw_symbol(':9')
-move((0.0, -6.0))
-comp.components['+112=A1-X1'].draw_symbol(':10')
-move((0.0, -24.0))
-comp.components['+112=A1-X1'].draw_symbol(':11')
-move((0.0, -6.0))
-comp.components['+112=A1-X1'].draw_symbol(':12')
-move((0.0, 18.0))
-move((20.0, 0.0))
-comp.components['-B7'].draw_symbol()
-move((40.0, -12.0))
-comp.components['-B3'].draw_symbol()
-comp.components['-K1'].draw_symbol()
-comp.begin_line()
-comp.components['-B1'].draw_symbol('o1')
-
-draw_symbol('-B1')
-draw_symbol('-K1')
-
-comp.draw_connections()
-

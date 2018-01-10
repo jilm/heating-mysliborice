@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import schema.symbols as sym
-
 components = {}
 terminals = {}
 connections = list()
