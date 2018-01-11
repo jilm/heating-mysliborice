@@ -5,6 +5,8 @@
 \usepackage{makeidx}
 \usepackage{python}
 
+\def\oC{{{}^\circ\mkern-2mu\rm C}}
+
 \makeindex
 \title{heating}
 \author{jlidinsky }
@@ -99,28 +101,28 @@
 \section{Označení signálu}
 
     Signál je uvozen znakem středník, následuje označení fyzikální veličiny
-    a je-li to nutné pak další rozlišovací znaky. Označení fyzikálních veličin
-    se používají následující:
+    a je-li to nutné pak další rozlišovací znaky. Použité fyzikální veličiny
+    jsou uvedeny v tabulce~\ref(tab:fyzikalni-veliciny)
 
-\begin{table}[]
-  \centering
-    \begin{tabular}{l l l}
-$T$ & K & Termodynamická teplota\\
-$t$ & & Teplota ve stupních celsia\\
-$\tau$ & s & čas s\\
-$Q$ & J & Teplo J\\
-$U$ & V & Napětí V\\
-$I$ & A &Proud A\\
-$p$ & Pa & tlak\\
-$F$ & $m^3 s^{-1}$ & průtok\\
-$m$ & kg & hmotnost\\
-$ro$ & & hustota\\
-$c$ & & měrná tepelná kapacita\\
-$V$ & & objem m3\\
-    \end{tabular}
-  \caption{Výčet funkčních celků}
-  \label{tab:myfirsttable}
-\end{table}
+    \begin{table}[]
+        \centering
+        \begin{tabular}{l l l}
+            $T$ & $\rm K$ & Termodynamická teplota.\\
+            $t$ & $\oC$ & Teplota.\\
+            $\tau$ & $\rm s$ & Čas.\\
+            $Q$ & $\rm J$ & Teplo.\\
+            $U$ & $\rm V$ & Napětí.\\
+            $I$ & $\rm A$ & Proud.\\
+            $p$ & $\rm Pa$ & Tlak.\\
+            $F$ & $\rm m^3\,s^{-1}$ & Hmotnostní průtok.\\
+            $m$ & $\rm kg$ & Hmotnost.\\
+            $\rho$ & $\rm kg\,m^{-3}$ & Hustota.\\
+            $c$ & $\rm J\,kg^{-1}\,K^{-1}$ & Měrná tepelná kapacita.\\
+            $V$ & $\rm m^3$ & Objem.\\
+        \end{tabular}
+        \caption{Označení použitých fyzikálních veličin.}
+        \label{tab:fyzikalni-veliciny}
+    \end{table}
 
 \section{Výjímky}
 
@@ -171,12 +173,12 @@ $V$ & & objem m3\\
 
 \chapter{Řídící systém}
 
-    Řídící systém je realizován běžným počítačm typu PC s OS LINUX, na kterém
+    Řídící systém je realizován běžným počítačm typu PC s OS Linux, na kterém
     běží program, který v nekonečné smyčce provádí řídící alogritmus. Program
-    je napsán v jazyce JAVA. Řídící alogoritmus je popsán pomocí textového
+    je napsán v jazyce Java. Řídící alogoritmus je popsán pomocí textového
     souboru ve formě vzájemně propojených modulů. Tento je pak interpretován
     řídícím programem. Při změně řídícího algoritmu tak není potřeba zasahovat
-    do JAVA kódu a poté ho znovu kompilovat. Více o konfiguraci Řídícího
+    do Java kódu a poté ho znovu kompilovat. Více o konfiguraci Řídícího
     viz xxx, o řídícím programu viz xxx a konečně o algoritmu řízení viz xxx.
 
     Jako vstupy a výstupy do a z techlonogie jsou použity komponenty firmy
@@ -234,11 +236,12 @@ $V$ & & objem m3\\
 
     \section{Teplota vody na výstupu z krbových kamen}
 
-        Teplotní čidlo s označením =KK-BT\index{=KK-BT}, měří teplotu vody na výstupu
-        z krbových kamen\index{krbová kamna}. Je umístěno na povrchu trubky horké smyčky,
-        co nejblíže ke krbovým kamnům. Jedná se o odporový senzor typu PT100\index{PT100}.
-        Čidlo je připojeno k převodníku Sensycon\index{} s označením -B6\index{-B6},
-        pro převod na proud. Převodník má rozsah xxx. Blokové schema je na následujícím
+        Teplotní čidlo s označením =KK-BT\index{=KK-BT}, měří teplotu vody na
+        výstupu z krbových kamen\index{krbová kamna}. Je umístěno na povrchu
+        trubky horké smyčky, co nejblíže ke krbovým kamnům. Jedná se o odporový
+        senzor typu PT100\index{PT100}. Čidlo je připojeno k převodníku
+        Sensycon\index{Sensycon} s označením -B6\index{-B6}, pro převod na
+        proud. Převodník má rozsah xxx. Blokové schema je na následujícím
         obrázku.
 
         \begin{tikzpicture}[scale=1.0]
@@ -249,6 +252,26 @@ $V$ & & objem m3\\
     \section{Teplota v podkroví}
 
     \section{Venkovní teplota}
+
+    \section{Binární výstupy}
+
+        Ke spínání solenoidových ventilů a čerpadel se používá modul binárních
+        výstupů\index{binární výstup} Quido\index{Quido}. Výstup modulu je
+        osazen relátky, s přepínacím kontaktem, který může spínat napětí do
+        $60\rm\:V\:AC$, nebo do $85\rm\:V\:DC$. Maximální spínaný proud je
+        $5\rm\:A$. Pro více informací viz katalogový list xxx. Aby bylo možno
+        spínat spotřebiče, jejichž jmenovité napětí je $230\rm\:V\:AC$ je
+        použito externí relé. Typové zapojení jednoho z binárních výstupů je
+        zřejmé z obrázku~\ref{fig:binary-out}. Celkové schema zapojení je pak
+        na straně xxx.
+
+        \begin{figure}\centering
+            \begin{tikzpicture}
+                \input{bo}
+            \end{tikzpicture}
+            \caption{Typové zapojení binárních výstupů modulu Quido.}
+            \label{fig:binary-out}
+        \end{figure}
 
     \chapter{Algoritmus}
 

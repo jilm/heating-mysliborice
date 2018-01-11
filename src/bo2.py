@@ -47,6 +47,15 @@ MIX_VALVE = Transform().scale(0.5).transform_points([
     (0.0, 0.0)
 ])
 
+VALVE = Transform().scale(0.5).transform_points([
+    (0.0, 0.0),
+    (EQ_TRIANGLE_H, 0.5),
+    (EQ_TRIANGLE_H, -0.5),
+    (-EQ_TRIANGLE_H, 0.5),
+    (-EQ_TRIANGLE_H, -0.5),
+    (0.0, 0.0)
+])
+
 # Schematicka znacka cerpadla
 circle = Circle()
 triangle = Line(Transform().scale(0.70).transform_points(EQ_TRIANGLE))
@@ -200,27 +209,34 @@ def write_change_over_switch(canvas, t = I, labels = None):
 
     return t.r_move(-0.5, 0.0), t.r_move(0.5, 0.5), t.r_move(0.5, -0.5)
 
-def write_coil(canvas, t = I, labels = None):
-    WH_RATIO = 3.0 / 4.0
-    t = t.r_move(0.5, 0.0)
-    Square(t.r_scale(WH_RATIO, 1.0)).write(canvas)
-    Line([(-0.5, 0.0), (-0.5 * WH_RATIO, 0.0)], t).write(canvas)
-    Line([(0.5, 0.0), (0.5 * WH_RATIO, 0.0)], t).write(canvas)
-    if labels is not None:
-        canvas.text(labels[0], t.transform_point((-0.5 * WH_RATIO, 0.0)), 'nw', 'small')
-        canvas.text(labels[1], t.transform_point((0.5 * WH_RATIO, 0.0)), 'ne', 'small')
-    return t.r_move(0.5, 0.0)
+def write_coil(canvas = None, t = I, labels = None):
+    if canvas is not None:
+        WH_RATIO = 3.0 / 4.0
+        Square(t.r_scale(WH_RATIO, 1.0)).write(canvas)
+        Line([(-0.5, 0.0), (-0.5 * WH_RATIO, 0.0)], t).write(canvas)
+        Line([(0.5, 0.0), (0.5 * WH_RATIO, 0.0)], t).write(canvas)
+        if labels is not None:
+            canvas.text(labels[0], t.transform_point((-0.5 * WH_RATIO, 0.0)), 'nw', 'small')
+            canvas.text(labels[1], t.transform_point((0.5 * WH_RATIO, 0.0)), 'ne', 'small')
+    return t.r_move(-0.5, 0.0), t.r_move(0.5, 0.0)
 
-def write_rele(canvas, t = I, labels = None):
+def write_coil_solenid(canvas = None, t = I, labels = None):
+    if canvas is not None:
+        Line(VALVE, t.r_scale(0.5).r_move(0.0, 0.35)).write(canvas)
+    return write_coil(canvas, t, labels)
+
+
+def write_rele(canvas = None, t = I, labels = None):
     coil_labels = labels[0:2] if labels is not None else None
     switch_labels = labels[2:] if labels is not None else None
-    tc = write_coil(canvas,  t, labels = coil_labels)
+    tc1, tc2 = write_coil(canvas,  t, labels = coil_labels)
     ts0, ts1, ts2 = write_change_over_switch(canvas, t.r_move(0.0, -1.5), labels = switch_labels)
-    return tc, ts1, ts2
+    return tc1, tc2, ts0, ts1, ts2
 
-def write_wire(canvas, t = I):
-    Line([(0.0, 0.0), (1.5, 0.0)], t).write(canvas)
-    return t.r_move(1.5, 0.0)
+def write_wire(canvas, t = I, scale = 1.0):
+    if canvas is not None:
+        Line([(0.0, 0.0), (1.0 * scale, 0.0)], t).write(canvas)
+    return t, t.r_move(1.0 * scale, 0.0)
 
 def write_gnd(canvas, t = I):
     Line([
@@ -245,10 +261,12 @@ def write_terminal(canvas, t = I, align = 'left'):
     return t.r_move(0.5 * SCALE * ALIGNMENTS[align], 0.0)
 
 def write_disconnect_terminal(canvas, t = I):
-    write_terminal(canvas, t)
-    write_terminal(canvas, t.r_move(1.5, 0.0), align='right')
-    write_switch(canvas, t.r_move(0.75, 0.0).r_scale(0.75), align = 'center')
-    return t.r_move(1.5, 0.0)
+    WIDTH = 1.5
+    if canvas is not None:
+        write_terminal(canvas, t.r_move(-0.5*WIDTH, 0.0))
+        write_terminal(canvas, t.r_move(0.5*WIDTH, 0.0), align='right')
+        write_switch(canvas, t.r_move(0.75, 0.0).r_scale(0.75), align = 'center')
+    return t.r_move(-0.5*WIDTH, 0.0), t.r_move(0.5*WIDTH, 0.0)
 
 def write_ref(canvas, t = I, text = ''):
     Line([ (-0.1, 0.0), (0.0, 0.0) ], t).write(canvas)
@@ -274,10 +292,10 @@ def write_fork(canvas, t, scale = 1.0):
     Circle(t.r_move(0.5, 0.0).r_scale(0.15)).write(canvas)
     return t.r_move(1.0, 0.5 * scale), t.r_move(1.0, -0.5 * scale)
 
-def write_join(canvas, t1, t2):
+def write_join(canvas, t1, t2, scale = 1.0):
     x1, y1 = t1.get_offset()
     x2, y2 = t2.get_offset()
-    x = max((x1, x2)) + 0.5
+    x = max((x1, x2)) + 0.5 * scale
     y = 0.5 * (y1 + y2)
     Line([
         (x1, y1),
@@ -287,9 +305,9 @@ def write_join(canvas, t1, t2):
     ]).write(canvas)
     Line([
         (x, y),
-        (x + 0.5, y)
+        (x + 0.5 * scale, y)
     ]).write(canvas)
-    return I.move_to((x + 0.5, y))
+    return I.move_to((x + 0.5 * scale, y))
 
 def diff(p1, p2):
     return p1[0] - p2[0], p1[1] - p2[1]
@@ -305,48 +323,57 @@ def get_t(write_fn, t1, i):
 canvas = Canvas()
 transform = I
 
-t1, t2 = write_fork(canvas,
-    write_ref(canvas, I, text = 'L1')
-, scale = 1.5)
-# kontakt rele
-tco, tnc, tno = write_change_over_switch(canvas, get_t(write_change_over_switch, t1, 0), labels = ['21', '', '14'])
-# paralelne ke kontaktum rele je ta spinaci svorka
-tsp = write_disconnect_terminal(canvas, t2)
-tj = write_join(canvas, tno, tsp)
-# civka solenoidu
-write_n(canvas,
-    write_wire(canvas,
-        write_coil(canvas, tj)
-    )
-)
-# civka rele
-tc = write_coil(canvas, t1.r_move(0.0, 1.5), labels = ['A1', 'A2'])
-write_wire(canvas, tc.r_move(-2.5, 0.0))
-tt = write_wire(canvas, tc)
-write_gnd(canvas, tt)
-# kontakt modulu quido
-tco, tnc, tno = write_change_over_switch(canvas, get_t(write_change_over_switch, tc.r_move(-2.5, 0.0), 2), labels = ['C1', 'NC1', 'NO1'])
-write_wire(canvas, tco.r_move(-1.5, 0.0))
-write_ref(canvas, tco.r_move(-1.5, 0.0), text = 'WD')
+upper_label_line = 1.0
+lower_label_line = -4.5
+# Linie 1
+t = write_ref(canvas, text = 'WD')
+t1, t2 = write_wire(canvas, t)
+# Quido kontakt
+tq = get_t(write_change_over_switch, t2, 0)
+t1, t2, t3 = write_change_over_switch(
+    canvas = canvas,
+    t = tq,
+    labels = ['C1', 'NC1', 'NO1'])
+canvas.text(
+    text='-B1',
+    point = (tq.get_offset()[0], upper_label_line),
+    position = 'n')
+t1, t2 = write_wire(canvas, t3, scale = 1.5)
+# Civka rele
+t_rele = t = get_t(write_rele, t2, 0)
+t1, t2, tc1, tc2, tc3 = write_rele(
+    canvas = canvas,
+    t = t_rele,
+    labels = ['A1', 'A2', '21', '', '14'])
+canvas.text(
+    text='-K1',
+    point = (t_rele.get_offset()[0], upper_label_line),
+    position = 'n')
+t1, t2 = write_wire(canvas, t2)
+write_gnd(canvas, t2)
 
-
-
-
-
-
-
-tco, tc, to = write_change_over_switch(canvas, I.r_move(0.0, 7.0), labels = ['c1', 'nc1', 'no1'])
-tc, tsc, tso = write_rele(canvas, write_wire(canvas, to), labels = ['A1', 'A2', '21', '', '14'])
-write_gnd(canvas, write_wire(canvas, tc))
-write_n(canvas,
-    write_wire(canvas,
-        write_coil(canvas,
-            write_wire(canvas, tso)
-        )
-    )
-)
-write_disconnect_terminal(canvas, tc.r_move(2.0, 0.0))
-
-
-
-
+# Linie 2
+# rozpojovaci svorka
+t1, t2 = write_disconnect_terminal(canvas, t_rele.r_move(0.0, -3.0))
+canvas.text(
+    text='-X1:1',
+    point = (t_rele.get_offset()[0], lower_label_line),
+    position = 'n')
+# paralelni propojeni s kontaktem rele
+tr = write_join(canvas, t2, tc3)
+tl = write_join(canvas, tc1, t1, scale = -1.0)
+# zleva pripoj fazi
+t1, t2 = write_wire(canvas, tl, scale = -1.0)
+write_ref(canvas, t2, text = 'L1')
+# zprava pripoj solenoid
+t1, t2 = write_wire(canvas, tr)
+t_solenoid = get_t(write_coil, t2, 0)
+t1, t2 = write_coil_solenid(
+    canvas = canvas,
+    t = t_solenoid)
+canvas.text(
+    text='-V1',
+    point = (t_solenoid.get_offset()[0], lower_label_line),
+    position = 'n')
+t1, t2 = write_wire(canvas, t2)
+write_n(canvas, t2)
