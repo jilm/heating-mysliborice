@@ -1,4 +1,4 @@
-\documentclass{book}
+\documentclass[a4paper,draft]{book}
 \usepackage[czech]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{tikz}
@@ -9,10 +9,11 @@
 
 \makeindex
 \title{heating}
-\author{jlidinsky }
-\date{November 2017}
+\author{Jiří Lidinský}
+\date{Leden 2018}
 
 \begin{document}
+\frontmatter
 
 \maketitle
 
@@ -25,78 +26,92 @@
     vloženy katalogové listy jak komponent topení, tak komponent řídícího
     systému.
 
+    K~použití řídícího systému bylo přistoupeno poté, kdy bylo obytné podkroví.
+    V~podkroví byla instalována krbová kamna, která jsou schopna ohřívat
+    i~vodu do radiátorů.
+
+\tableofcontents
+
+\mainmatter
+
 \chapter{Značení}
 
     V tomto dokumentu je použito hierarchické značení, které vychází z normy
     xxx. Označení každého prvku systému může být složeno z několika bloků:
-    i) umístění, ii) funkční celek, iii)druh předmětu, iv) označení svorky,
-    nebo přípojného místa, v) označení signálu. Označení nemusí obsahovat
-    všechny tyto komponenty, pokud nehrozí nedorozumění nebo pokud to nedává
-    smysl. Každý z bloků označení je uvozen speciálním symbolem.
+    i)~umístění, ii)~funkční celek, iii)~druh předmětu, iv)~označení svorky,
+    nebo přípojného místa, v)~označení signálu. Označení nemusí obsahovat
+    všechny tyto komponenty, pokud nehrozí nejasnost, nebo pokud to nedává
+    smysl. Každý~z bloků označení je uvozen speciálním symbolem.
 
 \section{Umístění}
 
-    Označení umístění se skládá z uvozovacího znaku plus a trojciferného čísla.
-    Přitom první číslice je označení podlaží a druhá číslice specifikuje
-    místnost. Podle podlaží je dům členěn na přízemí a podkroví. Přízemí
-    je označeno číslem jedna a podkroví číslicí dvě. Pokud potřebuji označit
-    něco vně domu je použita číslice nula.
+    Označení umístění, tedy označení místnosti uvnitř domu se skládá
+    z~uvozovacího znaku plus a~trojciferného čísla. Přitom první číslice
+    je označení podlaží a druhá číslice specifikuje místnost. Podle podlaží
+    je dům členěn na přízemí a podkroví. Přízemí je označeno číslem jedna
+    a~podkroví číslicí dvě. Pokud potřebuji označit něco vně domu je použita
+    číslice nula. Číslování místností bylo převzato ze stavebního projektu.
+    Čísla místností jsou uvedena v tabulce~\ref{tab:room-numbers}
 
-  \begin{table}[]
-    \centering
-    \begin{tabular}{l l}
-      +1.00 & Celé přízemí\\
-      +1.01 & Kuchyně\\
-      +1.02 & Obývací pokoj\\
-      +1.03 & Ložnice I.\\
-      +1.04 & Ložnice II.\\
-      +1.05 & Chodba\\
-      +1.06 & Koupelna\\
-      +1.07 & Záchod\\
-      +1.08 & Prádelna\\
-      +1.09 & Botník\\
-      +1.10 & Zádveří\\
-      +1.11 & Schodiště\\
-      +1.12 & Garáž\\
-      +1.13 & Venkovní prostor vstupních dveří\\
-      +1.14 & Venkovní prostor směrem do zahrady\\
-      \texttt{+200} & celé podkroví\\
-      \texttt{+201} & Ložnice I.\\
-      \texttt{+202} & Ložnice II.\\
-      \texttt{+203} & Kuchyň a jídelna\\
-      \texttt{+204} & Obývací pokoj\\
-      \texttt{+205} & Koupelna\\
-      \texttt{+206} & Schodiště\\
-      \texttt{+207} & Technická místnost
-    \end{tabular}
-    \caption{Označení místností domu}
-    \label{tab:rooms}
-  \end{table}
+    \input{room_numbers}
+
+    Označení místností se používá pro prvky, nebo komponenty topení, které
+    se nacházejí přímo v dané místnosti.
+
 
 \section{Funkční celky}
 
     Označení funkčního celku je uvozeno znakem rovnítka, které je následováno
-    kombinací číslic a písmen. Funkčními celky v rámci tohoto projektu jsou:
+    kombinací číslic a písmen. Funkční celky se použijí pro provky nebo
+    komponenty systému vytápění, které nemají přímý vztah k nějaké konkrétní
+    místnosti. Použité funkční celky jsou vyjmenovány
+    v~tabulce~\ref{tab:funkcni-celky}
 
-\begin{table}[]
-  \centering
-    \begin{tabular}{ l l}
-    \textsf{=KK} & krbová kamna\\
-    =KKA & vnitřní okruh krbových kamen\\
-    =KKB & vnější okruh krbových kamen\\
-    =OT & Soustava otopných těles\\
-    \textsf{=OT1} & Soustava otopných těles v přízemí\\
-    =OT2 & Soustava otopných těles v podkroví\\
-    =HP & Tepelné čerpadlo\\
-    \end{tabular}
-  \caption{Výčet funkčních celků}
-  \label{tab:funkcnicelky}
-\end{table}
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{r|l}
+        \textsf{=KK} & krbová kamna\\
+        =KKA & vnitřní okruh krbových kamen\\
+        =KKB & vnější okruh krbových kamen\\
+        =OT & Soustava otopných těles\\
+        \textsf{=OT1} & Soustava otopných těles v přízemí\\
+        =OT2 & Soustava otopných těles v podkroví\\
+        =HP & Tepelné čerpadlo\\
+        \end{tabular}
+    \caption{Výčet funkčních celků.}
+    \label{tab:funkcni-celky}
+    \end{table}
 
 \section{Druh předmětu}
 
     Označení druhu předmětu je uvozeno pomlčkou, která je následována
-    písmenným symbolem a pořadovým číslem, je-li to nutné.
+    písmenným symbolem a pořadovým číslem, je-li to nutné. Slouží k označení
+    konkrétního prvku, nebo komponenty sytému vytápění. Označení druhu
+    předmětu je kombinováno buďto s označením místnosti, nebo funkčního
+    celku, nebo stojí samostatně.
+
+    S~označením místnosti jsou svázány otopná tělesa. Takže, například,
+    radiátor v podroví v ložnici č I. je: +201-OT. Dalším prvkem, který
+    je typicky svázán s označením místnosti je čidlo měření teploty. Takže
+    termostat, umístěný v přízemí v obývacím pokoji má označení: +102-TK.
+
+    S~označením dílčího celku se pojí prvky, které nelze jednoznačně přiřadit
+    ke konkrétní místnosti, ale přísluší jednoznačně k některému ze zdrojů
+    topné vody, nebo k otopným tělesům přízemí nebo pokroví. Tedy, motor
+    čerpadla vnitřního okruhu krbových kamen v podkroví nese označení
+    =KKA-M.
+
+    Stejné označení jako u prvků řídícího systému se nepoužívá nikde jinde,
+    nehrozí proto záměna a typicky nejsou uvozeny jiným označením. Jsou to
+    například vstupně výstupní moduly -B1--6, nebo relé -K1--9, jističe
+    -FA1, FA2, ...
+
+    \input{component_list}
+
+\section{Označení svorky, přípojného místa}
+
+    Označení svorky nebo přípojného místa je uvozeno dvojtečkou a je vždy
+    použito ve spojení s druhem předměntu. Nestojí tedy nikdy samostatně.
 
 \section{Označení signálu}
 
@@ -119,24 +134,27 @@
             $\rho$ & $\rm kg\,m^{-3}$ & Hustota.\\
             $c$ & $\rm J\,kg^{-1}\,K^{-1}$ & Měrná tepelná kapacita.\\
             $V$ & $\rm m^3$ & Objem.\\
+            $P$ & $\rm W$ & Výkon, příkon.\\
         \end{tabular}
         \caption{Označení použitých fyzikálních veličin.}
         \label{tab:fyzikalni-veliciny}
     \end{table}
 
-\section{Výjímky}
+\section{Alternativní značení}
 
-    Z důvodu přehlednosti a jednoduchosti mají následující signály a objekty
-    ještě alternativní značení uvedené v tabulce
+    Uvedené značení bohužel nekoresponduje se značením v původním projektu
+    vytápění, je zde uvedena převodní tabulka mezi značením v původním
+    projektu a mezi zde zavedeným značením. Bude-li někde dále v textu
+    použito toto původní značení, uvedu na tomto místě upozornění.
 
-\begin{table}[]
-  \centering
-    \begin{tabular}{ l l l}
-        \texttt{=KK:H;}$t$\index{$t_1$|see {=KK:H;t}} & $t_1$ & Teplota vody na výstupu z krbových kamen.
-    \end{tabular}
-  \caption{Výčet funkčních celků}
-  \label{tab:myfirsttable}
-\end{table}
+    \begin{table}[]
+        \centering
+        \begin{tabular}{ l l l}
+            \texttt{=KK:H;}$t$\index{$t_1$|see {=KK:H;t}} & $t_1$ & Teplota vody na výstupu z krbových kamen.
+        \end{tabular}
+        \caption{Výčet funkčních celků}
+        \label{tab:myfirsttable}
+    \end{table}
 
 \begin{tikzpicture}
   \draw[thick] (0,0) -- (20.7,0) -- (20.7,12) -- (0,12) -- (0,0);
@@ -273,6 +291,8 @@
             \label{fig:binary-out}
         \end{figure}
 
+        \cite{da2rs}
+
     \chapter{Algoritmus}
 
         Z teploty kotle jsou odvozeny tři binární signály, jak je vidět z
@@ -285,7 +305,12 @@
             \caption{Vyhodnocení teploty na výstupu z krbových kamen.}
         \end{figure}
 
+\appendix
 
-    \printindex
+\backmatter
+
+\printindex
+\bibliographystyle{alpha}
+\bibliography{sources}
 
 \end{document}
