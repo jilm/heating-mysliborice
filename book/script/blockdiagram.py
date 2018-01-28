@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 from schema.canvas import Path
 from schema.canvas import Canvas
@@ -38,39 +39,40 @@ triangle = Line(Transform().scale(0.70).transform_points(EQ_TRIANGLE))
 
 # Krbova kamna
 def write_heater(canvas, transf = I):
-    t = I.scale(3.0, 4.0).transform(transf)
-    symbol = Square(t)
-    symbol.write(canvas)
-    return transf.move(transf.transform_vector((3.0, 0.0)))
+    if canvas is not None:
+        t = I.scale(3.0, 4.0).transform(transf)
+        symbol = Square(t)
+        symbol.write(canvas)
+    return transf.r_move(-1.5, 0.0), transf.r_move(1.5, 0.0)
 
 def write_pump(canvas, transf = I):
-    symbol = Circle(transf)
-    symbol.write(canvas)
-    t = I.scale(-0.6, 0.6).transform(transf)
-    symbol = Line(EQ_TRIANGLE, t)
-    symbol.write(canvas)
-    return transf.move(transf.transform_vector((1.5, 0.0)))
+    if canvas is not None:
+        symbol = Circle(transf)
+        symbol.write(canvas)
+        t = I.scale(-0.6, 0.6).transform(transf)
+        symbol = Line(EQ_TRIANGLE, t)
+        symbol.write(canvas)
+    return transf.r_move(-0.5, 0.0), transf.r_move(0.5, 0.0)
 
 def write_mix_valve(canvas, transf = I):
-    symbol = Line(MIX_VALVE, transf)
-    symbol.write(canvas)
-    t1 = transf.move(transf.transform_vector((1.5, 0.0)))
-    t2 = transf.rotate_vect()
-    t2 = t2.move(t2.transform_vector((1.5, 0.0)))
-    return t1, t2
+    if canvas is not None:
+        symbol = Line(MIX_VALVE, transf)
+        symbol.write(canvas)
+    return transf.r_move(-0.5, 0.0), transf.r_move(0.5, 0.0), transf.rotate_vect().r_move(0.5, 0.0)
 
 def write_corner(canvas, transf = I):
-    symbol = Line(((-0.5, 0.0), (0.0, 0.0), (0.0, -0.5)), transf)
-    symbol.write(canvas)
-    transf = transf.rotate_vect()
-    return transf.move(transf.transform_vector((1.5, 0.0)))
+    if canvas is not None:
+        symbol = Line(((-0.5, 0.0), (0.0, 0.0), (0.0, -0.5)), transf)
+        symbol.write(canvas)
+    return transf.r_move(-0.5, 0.0), transf.rotate_vect().r_move(0.5, 0.0)
 
 def write_radiator(canvas, transf = I):
-    symbol = Square(I.scale(3.0, 4.0).transform(transf))
-    symbol.write(canvas)
-    return transf.move(transf.transform_vector((4.0, 0.0)))
+    if canvas is not None:
+        symbol = Square(I.scale(2.0, 3.0).transform(transf))
+        symbol.write(canvas)
+    return transf.r_move(-1.0, 0.0), transf.r_move(1.0, 0.0)
 
-def write_tee(canvas, t1, t2):
+def write_tee2(canvas, t1, t2):
     p1x, p1y = t1.transform_point((0.0, 0.0))
     v1x, v1y = t1.transform_vector((-1.0, 0.0))
     p2x, p2y = t2.transform_point((0.0, 0.0))
@@ -82,17 +84,57 @@ def write_tee(canvas, t1, t2):
     symbol.write(canvas)
     return t.move(t.transform_vector((1.5, 0.0)))
 
+def write_tee(canvas, t = I):
+    if canvas is not None:
+        symbol = Line(((-0.5, 0.0), (0.5, 0.0), (0.0, 0.0), (0.0, -0.5)), t)
+        symbol.write(canvas)
+    return t.r_move(-0.5, 0.0), t.r_move(0.5, 0.0), t.rotate_vect().r_move(0.5, 0.0)
+
+def write_wire(canvas, t = I, scale = 1.0):
+    if canvas is not None:
+        Line([(0.0, 0.0), (1.0 * scale, 0.0)], t).write(canvas)
+    return t, t.r_move(1.0 * scale, 0.0)
+
+def get_t(write_fn, t1, i = 0):
+    t2 = write_fn(None, t1)[i]
+    x1, y1 = t1.get_offset()
+    x2, y2 = t2.get_offset()
+    dx, dy = x1 - x2, y1 - y2
+    return t1.move((dx, dy))
+
+
 # Nakresli
 canvas = Canvas()
 transform = I
-transform, t2 = write_mix_valve(canvas, transform)
-transform = write_pump(canvas, transform)
-transform = write_corner(canvas, transform)
-transform = write_radiator(canvas, transform)
-transform = write_corner(canvas, transform)
-transform = write_tee(canvas, transform, t2)
-transform, t2 = write_mix_valve(canvas, transform)
-transform = write_pump(canvas, transform)
-transform = write_corner(canvas, transform)
-transform = write_heater(canvas, transform)
-transform = write_corner(canvas, transform)
+t1, t2, t3 = write_mix_valve(canvas, I)
+_, t2 = write_wire(canvas, t2)
+_, t2 = write_pump(canvas, get_t(write_pump, t2))
+_, t2 = write_wire(canvas, t2, 1.5)
+_, t2 = write_corner(canvas, get_t(write_corner, t2))
+_, t2 = write_wire(canvas, t2, 0.5)
+_, t2 = write_radiator(canvas, get_t(write_radiator, t2))
+_, t2 = write_wire(canvas, t2, 0.5)
+_, t2 = write_corner(canvas, get_t(write_corner, t2))
+_, t2 = write_wire(canvas, t2, -t3.get_offset()[1] + t2.get_offset()[0] - 1.0)
+#_, t2, t3 = write_tee(canvas, t2.move_to((t3.get_offset()[0], t2.get_offset()[1])))
+_, t2, t3 = write_tee(canvas, get_t(write_tee, t2))
+_, t2 = write_wire(canvas, t2, -0.5)
+_, t2, t3 = write_mix_valve(canvas, get_t(write_mix_valve, t2))
+_, t2 = write_pump(canvas, get_t(write_pump, t2))
+_, t2 = write_corner(canvas, get_t(write_corner, t2))
+_, t2 = write_heater(canvas, get_t(write_heater, t2))
+_, t2 = write_corner(canvas, get_t(write_corner, t2))
+write_tee(canvas, t2.move_to((t3.get_offset()[0], t2.get_offset()[1])))
+
+
+#transform, t2 = write_mix_valve(canvas, transform)
+#transform = write_pump(canvas, transform)
+#transform = write_corner(canvas, transform)
+#transform = write_radiator(canvas, transform)
+#transform = write_corner(canvas, transform)
+#transform = write_tee(canvas, transform, t2)
+#transform, t2 = write_mix_valve(canvas, transform)
+#transform = write_pump(canvas, transform)
+#transform = write_corner(canvas, transform)
+#transform = write_heater(canvas, transform)
+#transform = write_corner(canvas, transform)

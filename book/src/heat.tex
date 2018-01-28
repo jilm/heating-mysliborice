@@ -20,8 +20,9 @@
 \chapter*{Scope}
 
     Tato dokumentace popisuje řízení topení v rodinném domě manželů Lidinských
-    v Myslibořicích. V kapitole xxx je popsáno topení, popis zapojení řídícího
-    systému je v kapitole xxx. Kapitola xxx pak obsahuje algoritmus řízení,
+    v~Myslibořicích. V~kapitole~\ref{chap:heating} je popis topeného systému,
+    popis zapojení řídícího systému je v~kapitole~\ref{chap:control}.
+    Kapitola~\ref{chap:algorithm} pak obsahuje algoritmus řízení,
     popis řídícího software je uveden v kapitole xxx. Na konci v příloze jsou
     vloženy katalogové listy jak komponent topení, tak komponent řídícího
     systému.
@@ -188,8 +189,12 @@
   \label{tab:CSLabels}
 \end{table}
 
+\chapter{Systém topení}\label{chap:heating}
 
-\chapter{Řídící systém}
+    Během dostavby obytného podkroví, byla doplněna krbová kamna, HAASON+SOHN,
+
+
+\chapter{Řídící systém}\label{chap:control}
 
     Řídící systém je realizován běžným počítačm typu PC s OS Linux, na kterém
     běží program, který v nekonečné smyčce provádí řídící alogritmus. Program
@@ -293,7 +298,7 @@
 
         \cite{da2rs}
 
-    \chapter{Algoritmus}
+    \chapter{Algoritmus řízení}\label{chap:algorithm}
 
         Z teploty kotle jsou odvozeny tři binární signály, jak je vidět z
         následujícího obrázku.
@@ -305,7 +310,19 @@
             \caption{Vyhodnocení teploty na výstupu z krbových kamen.}
         \end{figure}
 
+    \chapter{Trocha fyziky}\label{chap:theory}
+
+    \chapter{Analýza naměřených dat}\label{chap:analyze}
+
+    \chapter{Budoucí vylepšení}\label{chap:future-improvements}
+
+    \chapter{Údržba}\label{chap:maintenance}
+
 \appendix
+
+    \chapter{Schemata}
+
+    \chapter{Katalogové listy}
 
 \backmatter
 
