@@ -296,16 +296,6 @@ class Valve(Component):
 
     def write_schema_symbol(self, canvas = None, t = I):
         if canvas is not None:
-            Line([
-                (0.0, 0.0),
-                (EQ_TRIANGLE_H, 0.5
-                .6+33333333333333
-                ),
-                (EQ_TRIANGLE_H, -0.5),
-                (-EQ_TRIANGLE_H, 0.5),
-                (-EQ_TRIANGLE_H, -0.5),
-                (0.0, 0.0)
-            ], t).write(canvas)
             Line([(EQ_TRIANGLE_H, 0), (EQ_TRIANGLE_H, 1.0)], t).write(canvas)
             Line([(-EQ_TRIANGLE_H, 0), (EQ_TRIANGLE_H, -1.0)], t).write(canvas)
         return t.r_move(-0.5, 0.0), t.r_move(0.5, 0.0)

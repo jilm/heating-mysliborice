@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# Nakresli blokovy diagram vyhrivani podkrovi z krbovych kamen.
+
 from schema.canvas import Path
 from schema.canvas import Canvas
 from schema.canvas import Circle
@@ -40,10 +42,10 @@ triangle = Line(Transform().scale(0.70).transform_points(EQ_TRIANGLE))
 # Krbova kamna
 def write_heater(canvas, transf = I):
     if canvas is not None:
-        t = I.scale(3.0, 4.0).transform(transf)
+        t = I.scale(2.0, 3.0).transform(transf)
         symbol = Square(t)
         symbol.write(canvas)
-    return transf.r_move(-1.5, 0.0), transf.r_move(1.5, 0.0)
+    return transf.r_move(-1.0, 0.0), transf.r_move(1.0, 0.0)
 
 def write_pump(canvas, transf = I):
     if canvas is not None:
@@ -107,24 +109,35 @@ def get_t(write_fn, t1, i = 0):
 canvas = Canvas()
 transform = I
 t1, t2, t3 = write_mix_valve(canvas, I)
+canvas.text('=KKB-MV', t2.r_move(0.0, 1.0).get_offset(), 'n')
 _, t2 = write_wire(canvas, t2)
 _, t2 = write_pump(canvas, get_t(write_pump, t2))
-_, t2 = write_wire(canvas, t2, 1.5)
+canvas.text('=KKB-P', t2.r_move(0.0, 1.0).get_offset(), 'n')
 _, t2 = write_corner(canvas, get_t(write_corner, t2))
-_, t2 = write_wire(canvas, t2, 0.5)
+_, t2 = write_wire(canvas, t2, 0.25)
 _, t2 = write_radiator(canvas, get_t(write_radiator, t2))
-_, t2 = write_wire(canvas, t2, 0.5)
+canvas.text('=OT', t2.get_offset(), 'se')
+_, t2 = write_wire(canvas, t2, 0.25)
 _, t2 = write_corner(canvas, get_t(write_corner, t2))
 _, t2 = write_wire(canvas, t2, -t3.get_offset()[1] + t2.get_offset()[0] - 1.0)
-#_, t2, t3 = write_tee(canvas, t2.move_to((t3.get_offset()[0], t2.get_offset()[1])))
 _, t2, t3 = write_tee(canvas, get_t(write_tee, t2))
-_, t2 = write_wire(canvas, t2, -0.5)
+write_wire(canvas, t3, 2.5)
+_, t2 = write_wire(canvas, t2, 1.0)
 _, t2, t3 = write_mix_valve(canvas, get_t(write_mix_valve, t2))
+canvas.text('=KKA-MV', t2.r_move(0.0, 1.0).get_offset(), 's')
+_, t2 = write_wire(canvas, t2)
 _, t2 = write_pump(canvas, get_t(write_pump, t2))
+canvas.text('=KKA-P', t2.r_move(0.0, 1.0).get_offset(), 's')
 _, t2 = write_corner(canvas, get_t(write_corner, t2))
+_, t2 = write_wire(canvas, t2, 0.25)
 _, t2 = write_heater(canvas, get_t(write_heater, t2))
+canvas.text('=KK', t2.get_offset(), 'nw')
+_, t2 = write_wire(canvas, t2, 0.25)
 _, t2 = write_corner(canvas, get_t(write_corner, t2))
-write_tee(canvas, t2.move_to((t3.get_offset()[0], t2.get_offset()[1])))
+_, t2 = write_wire(canvas, t2, 2.0)
+_, t2, t3 = write_tee(canvas, t2.move_to((t3.get_offset()[0], t2.get_offset()[1])))
+write_wire(canvas, t3, 2.5)
+_, t2 = write_wire(canvas, t2, 1.0)
 
 
 #transform, t2 = write_mix_valve(canvas, transform)
