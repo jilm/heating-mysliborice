@@ -216,6 +216,137 @@
         \input{build/blockdiagram}
     \end{tikzpicture}
 
+Původní vytápění bylo postaveno na tepelném čerpadle. V přízemí se topí do
+podlahového topení. Pro nucenou cirkulaci vody se používám čerpadlo =OT1-P.
+K regulaci teploty je v místnosti +102 osazen termostat s označením
+xxx. Tento termostat má kontaktní výstup s spínal přímo čerpadlo =OT1-P.
+Blokové schema je na obrázku xxx.
+
+S dostavbou podkoroví, byla osazena krbová kamna xxx a radiátory v podkroví.
+Krbová kamna mají vnitřní smyčku s čerpadlem =KK-P a termostatickým
+směšovacím ventilem =KK-VM. Tato vnitřní smyčka zajistí, že nejdříve
+se topná voda nahřeje na 60 xxx a až poté se pustí do radiátorů.
+Cílem je prodloužení životnosti krbových kamen. Aby bylo možné pouštět
+topnou vodu i do podlahového topení v přízemí, musel být okruh topení
+osazen směšovacím ventilem =OT2-VM. Nucenou cirkulaci v otopných tělesech
+v podkroví zajišťuje čerpadlo =OT2-P. Schematický diagram je na obrázku xxx.
+
+Oba okruhy jsou propojeny, tak aby bylo možné kombinovat zdroje topné vody
+a otopná tělesa přízemí a podkroví. Volba vytápěcího režimu se provádí
+otevřením, zavřením jednotlivých solenoidových ventilů. Kompletní schematický
+diagram je na obrázku xxx. Kompletní schema vytápěcího systému je na
+xxx.
+
+V následujících kapitolách jsou uvedeny hlavní parametry jednotlivých
+komponent vytápění. 
+
+
+  \section{Kotel}
+
+    Použita jsou \index{krbová kamna} HAAS+SOHN typ \index{Tanaga} s výkonem
+    $3{,}5$ -- $15\:\rm kW$, maximální teplota
+    výstupní vody je \degC{80}, doporučený tepelný spád je \degC{75-60}, obsah
+    tepelného výměníku je $29{,}5\:\rm l$. Více viz katalogový list na straně
+    \pageref{apx:kotel}
+
+  \section{Plnící směšovací ventil}
+
+    Pro zabránění kondenzace a tím rezavění kotle je na studené větvi kotle
+    osazen termostatický směšovací ventil ESBE VTC 318, DN 20, \degC{60}.
+    Ventil obsahuje termostat, který začíná otvírat vstup A při teplotě výstupní 
+    (smíchané) vody ve výstupu AB \degC{60}. Když teplota ve vstupu A překročí
+    jmenovitou teplotu o \degC{10}, vstup B je úlně uzavřen.
+    $\rm Kvs = 3{,}2\: m^3\, h^{-1}$. Ventil bude dále v textu označován jako
+    \SVA, zdvih ventilu budu označovat $h_1 \in \langle 0, 1 \rangle$. 
+
+  \section{Směšovací ventil}
+
+    K regulaci teploty do radiátorů je osazen směšovací ventil ESBE VRG 131,
+    DN 20, $\rm Kvs = 6{,}3\: m^3\, h^{-1}$. Ventil bude dále v textu označen
+    jako \SVB, zdvih bude označován jako $h_2 \in \langle 0, 1 \rangle$.
+    Charakteristika ventilu, tedy závislost mezi zdvihem a procentuálním
+    průtokem je dána ve formě grafu. Zdá se, že charakteristiku bude možné
+    aproximovat goniometrickými funkcemi.
+    $$\frac{F}{F_0} = \half + \half \cos\left(\frac{h}{h_0} \pi\right).$$
+
+    Ventil je osazen elektropohonem ESBE ARA 639. Tento pohon otevře z jedné
+    polohy do druhé za 15, 30, 60, 120 s. (TODO nutno ověřit).
+
+  \section{Čerpadlo}
+
+    Je použito čerpadlo Grundfos ALPHA2 L 15-40 130. Vztah mezi tlakem
+    a průtokem je dán ve formě grafu. Zkusme aproximovat charakteristiku
+    polynomem druhého řádu.
+
+    \begin{figure}[hp]
+      \centering
+      \caption{Závislost tlaku na průtoku u čerpadel Grundfos ALPHA}
+    \end{figure}
+
+    \begin{equation}
+    \end{equation}
+
+    kde $p$ je tlak v Pa a $F$ je průtok v $\rm kg\,s^{-1}$.
+
+  \section{Radiátory}
+
+    Jsou použity radiátory značky KORADO pravděpodobně typ RADIK KLASIK.
+    Následují vybrané parametry z katalogového listu \cite{radik}. Osazeny
+    jsou čtyři radiátory, o rozměrech uvedených v následující tabulce:
+
+    \begin{table}[hb]
+      \centering
+        \begin{tabular}{cccc}
+          L [mm] & H [mm] & Typ \\
+          \hline
+          2000 & 600 & 21 & +201\\
+          2000 & 600 & 21 & +202\\
+          1400 & 600 & 21 & +203\\
+          2000 & 600 & 22 & +204
+        \end{tabular}
+      \caption{Rozměry použitých radiátorů}
+    \end{table}
+
+    Následují další vybrané parametry:
+
+    \begin{table}[h]
+      \centering
+        \begin{tabular}{l|r@{,}lr@{,}ll|lr}
+          & Typ 21 & Typ 22\\
+          \hline
+          Jmenovitý tepelný výkon &  1&288    & 1&452   & $\rm kW m^{-1}$\\
+          Teplotní exponent $n$   &  1&3319   & 1&3353  & $\rm -$\\
+          $K_T$                   &  0&033993 & 0&05120 \\
+          $c_0$                   &  1&3505   & 1&3438\\
+          $b$                     &  0&8309   & 0&8055\\
+          $c_1$                   & -0&00002395 & -0&00000514\\
+          Hmotnost tělesa         &  26&4     & 31&1    & $\rm [l m^-1]$\\
+          Vodní objem             &  5&8      & 5&8     & $\rm [l m^-1]$\\
+          Průtokový součinitel    &  1&$\dot 10^{-4}$ & $10^{-4}$ & $A_T$\\
+          Součinitel odporu $\epsilon$ & 8&5 & 8&5\\
+        \end{tabular}
+      \caption{Vybrané paramtery radiátorů}
+    \end{table}
+
+    Více viz katalogový list.
+
+
+
+\begin{table}
+      \centering
+      \begin{tabular}{ccccccccc}
+        $C_1$ & $C_2$ & $C_3$ & $V_1$ & $V_2$ & $V_3$ & $V_4$ & $V_5$ & $V_6$\\
+        \hline
+        on    & on    &       & on    & off   &       & on    & off   & off\\
+        on    & on    & on    & on    & off   & on    & on    & on    & off\\
+              &       & on    &       &       & on    &       & off   & off\\
+        off   & on    & on    & off   & off   & on    & off   & off   & on\\
+        on    & on    &       & on    & on    &       & on    & off   & off\\
+        off   & on    &       & off   & on    &       & on    & off   & off\\
+        off   & on    & off   & off   & off   & off   & off   & off   & on
+      \end{tabular}
+\end{table}
+
 \chapter{Řídící systém}\label{chap:control}
 
     Řídící systém je realizován běžným počítačm typu PC s OS Linux, na kterém
