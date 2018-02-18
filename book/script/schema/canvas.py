@@ -40,25 +40,50 @@ class Canvas(Writable):
 
     def __init__(self):
         self.writables = Queue()
+        self.unit=''
+        self.opened = False
+        self.closed = False
+        self.line_width = 0.4
 
-    def move_to(self, x, y):
-        sys.stdout.write('\draw ({},{})'.format(x, y))
+    def __str__(self):
+        return 'This is a Canvas instance, opened: {}, closed: {}'.format(self.opened, self.closed)
 
-    def line_to(self, x, y):
-        sys.stdout.write(' -- ({},{})'.format(x, y))
+    def set_line_width(self, width):
+        self.line_width = width
+
+    def open(self):
+        self.opened = True
 
     def close(self):
-        sys.stdout.write('-- cycle;')
+        if not self.opened:
+            self.open()
+        self.closed = True
 
+    def write(self, text):
+        if not self.opened:
+            self.open()
+        sys.stdout.write(text)
+
+    def move_to(self, x, y):
+        self.write('\draw ({},{})'.format(x, y))
+
+    def line_to(self, x, y):
+        self.write(' -- ({},{})'.format(x, y))
+
+    def close_path(self):
+        self.write('-- cycle;')
+
+    def get_draw_params(self):
+        return 'line width={}{}'.format(self.line_width, self.unit)
 
     def line(self, points):
         """
         Draw strait line between all of the given points.
         Points must be given in the form of collection of x, y tuples.
         """
-        form = ('({},{})'.format(x, y) for x, y in points)
+        form = ('({0}{2},{1}{2})'.format(x, y, self.unit) for x, y in points)
         concat = functools.reduce(lambda a, b: '{} -- {}'.format(a, b), form)
-        print('\draw {};'.format(concat))
+        self.write('\draw[{1}] {0};'.format(concat, self.get_draw_params()))
 
     def closed_line(self, points):
         """
@@ -66,9 +91,9 @@ class Canvas(Writable):
         the first and the last point by a line. Points must be given in the
         form of collection of x, y tuples.
         """
-        form = ('({},{})'.format(x, y) for x, y in points)
+        form = ('({0}{2},{1}{2})'.format(x, y, self.unit) for x, y in points)
         concat = functools.reduce(lambda a, b: '{} -- {}'.format(a, b), form)
-        print('\draw {} -- cycle;'.format(concat))
+        self.write('\draw[{1}] {0} -- cycle;'.format(concat, self.get_draw_params()))
 
     def text(self, text, point, position=None, size=None):
         """Draw given text at given position."""
@@ -81,7 +106,7 @@ class Canvas(Writable):
             size_value = TEXT_SIZE[size]
         else:
             size_value = ''
-        print('\draw ({},{}) node[{}] {{{} {}}};'.format(
+        self.write('\draw ({},{}) node[{}] {{{} {}}};'.format(
             x, y, anchor, size_value, text))
 
 
@@ -90,9 +115,33 @@ class Canvas(Writable):
                                             y + height), (x, y + height), (x, y)))
 
     def circle(self, x, y, radius):
-        print('\draw ({},{}) circle ({});'.format(x, y, radius))
+        self.write('\draw ({},{}) circle ({});'.format(x, y, radius))
 
-canvas = Canvas()
+#canvas = Canvas()
+
+class StandaloneCanvas(Canvas):
+
+    def __init__(self):
+        Canvas.__init__(self)
+
+    def __str__(self):
+        return '{}\n  Instance of a StandaloneCanvas'.format(Canvas.__str__(self))
+
+    def open(self):
+        Canvas.open(self)
+        self.write('\\documentclass{article}')
+        self.write('\\usepackage{tikz}')
+        self.write('\\usepackage[paperwidth={}mm, paperheight={}mm, left=0.3cm, right=0.3cm, top=0.3cm, bottom=0.3cm, hoffset=0cm]{{geometry}}'.format(self.paper_size[0], self.paper_size[1]))
+        self.write('\\begin{document}')
+        self.write('\\noindent\\begin{tikzpicture}')
+
+    def setPaperSize(self, size):
+        self.paper_size = size
+
+    def close(self):
+        self.write('\\end{tikzpicture}')
+        self.write('\\end{document}')
+        Canvas.close(self)
 
 # It allows to draw a line. Interanally it contains a list of tupels where
 # the first character of the tuple determine the type of line and the meaning
