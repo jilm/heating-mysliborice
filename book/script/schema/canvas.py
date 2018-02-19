@@ -106,8 +106,8 @@ class Canvas(Writable):
             size_value = TEXT_SIZE[size]
         else:
             size_value = ''
-        self.write('\draw ({},{}) node[{}] {{{} {}}};'.format(
-            x, y, anchor, size_value, text))
+        self.write('\draw {0} node[{1}] {{{2} {3}}};'.format(
+            self.form_point(x, y), anchor, size_value, text))
 
 
     def rect(self, x, y, width, height):
@@ -116,6 +116,9 @@ class Canvas(Writable):
 
     def circle(self, x, y, radius):
         self.write('\draw ({},{}) circle ({});'.format(x, y, radius))
+
+    def form_point(self, x, y):
+        return '({0}{2},{1}{2})'.format(x, y, self.unit)
 
 #canvas = Canvas()
 

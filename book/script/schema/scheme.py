@@ -25,10 +25,13 @@ PAPERS = {
     }
 }
 
+GRID_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p']
+GRID_NUMBERS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+
 LINE_WIDTHS = {
-    'TINY' : 0.35,
-    'NORMAL' : 0.5,
-    'BOLD' : 0.7
+    'TINY' : 0.18,
+    'NORMAL' : 0.25,
+    'BOLD' : 0.5
 }
 
 class Scheme:
@@ -85,21 +88,54 @@ class Scheme:
         self.draw_vline(0, y, -size)
         self.draw_vline(0, -y, size)
         # draw grid
+        y = 0.5 * grid_frame_size[1]
         hgrid, vgrid = self.paper['GRID']
         size = 0.5 * size
         dist = 0.5 * grid_frame_size[0] / hgrid
         for i in range(hgrid - 1):
-            self.draw_vline((i+1)*dist, y, -size)
-            self.draw_vline(-dist*(i+1), y, -size)
-            self.draw_vline((i+1)*dist, -y, size)
-            self.draw_vline(-dist*(i+1), -y, size)
+            x = (i+1)*dist
+            self.draw_vline(x, y, -size)
+            self.draw_vline(-x, y, -size)
+            self.draw_vline(x, -y, size)
+            self.draw_vline(-x, -y, size)
+            self.canvas.text(GRID_NUMBERS[hgrid - 1 - i]
+                , (-x + 0.5*dist,y - 0.5*size), size='large')
+            self.canvas.text(GRID_NUMBERS[hgrid + i]
+                , (x - 0.5*dist,y - 0.5*size), size='large')
+            self.canvas.text(GRID_NUMBERS[hgrid - 1 - i]
+                , (-x + 0.5*dist, - y + 0.5*size), size='large')
+            self.canvas.text(GRID_NUMBERS[hgrid + i]
+                , (x - 0.5*dist, - y + 0.5*size), size='large')
+        self.canvas.text(GRID_NUMBERS[0]
+            , (-(hgrid - 0.5)*dist,y - 0.5*size), size='large')
+        self.canvas.text(GRID_NUMBERS[hgrid*2-1]
+            , ((hgrid - 0.5)*dist,y - 0.5*size), size='large')
+        self.canvas.text(GRID_NUMBERS[0]
+            , (-(hgrid - 0.5)*dist, -y + 0.5*size), size='large')
+        self.canvas.text(GRID_NUMBERS[hgrid*2-1]
+            , ((hgrid - 0.5)*dist, - y + 0.5*size), size='large')
 
         dist = 0.5 * grid_frame_size[1] / vgrid
+        x = 0.5 * grid_frame_size[0]
         for i in range(vgrid - 1):
-            self.draw_hline(x, (i+1)*dist, -size)
-            self.draw_hline(x, -dist*(i+1), -size)
-            self.draw_hline(-x, (i+1)*dist, size)
-            self.draw_hline(-x, -dist*(i+1), size)
+            x = 0.5 * grid_frame_size[0]
+            y = (i + 1) * dist
+            self.draw_hline(x, y, -size)
+            self.draw_hline(x, -y, -size)
+            self.draw_hline(-x, y, size)
+            self.draw_hline(-x, -y, size)
+            x = x - 0.5 * size
+            y = (i + 0.5) * dist
+            self.canvas.text(GRID_LETTERS[vgrid-1-i], (x, y), size='large')
+            self.canvas.text(GRID_LETTERS[vgrid-1-i], (-x, y), size='large')
+            self.canvas.text(GRID_LETTERS[vgrid+i], (x, -y), size='large')
+            self.canvas.text(GRID_LETTERS[vgrid+i], (-x, -y), size='large')
+        x = 0.5 * (grid_frame_size[0] - size)
+        y = (vgrid - 0.5) * dist
+        self.canvas.text(GRID_LETTERS[0], (x, y), size='large')
+        self.canvas.text(GRID_LETTERS[0], (-x, y), size='large')
+        self.canvas.text(GRID_LETTERS[2*vgrid-1], (x, -y), size='large')
+        self.canvas.text(GRID_LETTERS[2*vgrid-1], (-x, -y), size='large')
         # draw cut marks
         cut_points = (
             (0.0, 0.0),
