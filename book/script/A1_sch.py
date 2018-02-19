@@ -62,11 +62,40 @@ class Quido88:
         #scheme.draw_circle(3.2, (-64.45, 40.0))
         #scheme.draw_circle(3.2, (64.45, -40.0))
         #scheme.draw_circle(3.2, (-64.45, -40.0))
+        
+class P5310:
+
+    dimensions = (17.0, 62.0)
+
+    def draw_face_view(self, scheme):
+        scheme.draw_rect(self.dimensions)
+        
+class Finder4031:        
+
+    dimensions = (15.8, 78.6, 82.0,)
+
+    def draw_face_view(self, scheme):
+        scheme.draw_rect(self.dimensions)
+        scheme.draw_rect((12.4, 29.0))        
+        
+class GNOME485:        
+
+    dimensions = (42.0, 57.0, 25.0,)
+
+    def draw_face_view(self, scheme):
+        scheme.draw_rect(self.dimensions)
+
+
 
 canvas = StandaloneCanvas()
 scheme = ScaledScheme(canvas, scale=0.5, paper='A3P')
 a1 = Cabinet()
+
 a1.content[0].put(Quido88())
 a1.content[0].put(Quido88())
+for i in range(9):
+    a1.content[1].put(Finder4031())
+a1.content[1].put(GNOME485())    
+    
 a1.draw_face_view(scheme)
 canvas.close()
