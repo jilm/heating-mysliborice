@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import schema.components as comp
+from schema.components import get_component
 
 # Řídící počítač
 comp.PC(
@@ -126,23 +127,23 @@ comp.Wire('-B3:in1', '-B7:6')
 a1 = comp.Cabinet('=A1')
 
 a1.content[0].put(get_component('-B1')) # Quido
-a1.content[0].put(put_component('-B2')) # Quido
+a1.content[0].put(get_component('-B2')) # Quido
 
 for i in range(9): # Vystupni rele K1-9
-    a1.content[1].put(get_component('-K{}'.format(i))
-    
+    a1.content[1].put(get_component('-K{}'.format(i+1)))
+
 a1.content[1].put(get_component('-B7')) # P5310
 a1.content[1].put(get_component('-B6')) # Sensycon
 a1.content[1].put(get_component('-B5')) # Gnome 485
 # x1
 x1 = comp.TerminalBlock('=A1-X1')
 for i in range(3):
-    x1.append(comp.Terminal('=A1-X1:{}'.format(i)))
+    x1.append(comp.Terminal('=A1-X1:{}'.format(i+1)))
 a1.content[2].put(x1)
 # x2
-x2 = TerminalBlock('=A1-X2')
+x2 = comp.TerminalBlock('=A1-X2')
 for i in range(10):
-    x2.append(comp.Terminal('=A1-X2:{}'.format(i)))
+    x2.append(comp.Terminal('=A1-X2:{}'.format(i+1)))
 a1.content[2].put(x2)
 # X3
 x3 = comp.TerminalBlock('=A1-X3')

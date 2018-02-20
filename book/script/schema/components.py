@@ -50,13 +50,13 @@ class Component:
 
 class DINAssembly:
 
-    """ Abstraktní třída komponent určených pro montáž na lištu DIN. """ 
+    """ Abstraktní třída komponent určených pro montáž na lištu DIN. """
 
     def get_dimensions(self):
-        retrun self.dimensions
+        return self.dimensions
 
     def draw_face_view(self, scheme):
-        scheme.draw_rect(self.get_dimensions()) 
+        scheme.draw_rect(self.get_dimensions())
 
 class PT100(Component):
 
@@ -94,7 +94,7 @@ class Terminal(Component, DINAssembly):
 
     def __init__(self, label):
         super().__init__(label)
-        
+
 
 class TerminalBlock(Component, DINAssembly):
 
@@ -105,16 +105,16 @@ class TerminalBlock(Component, DINAssembly):
     def __init__(self, label):
         super().__init__(label)
         self.content = list()
-        
+
     def append(self, terminal):
         self.content.append(terminal)
-        
+
     def get_dimensions(self):
         return (
             sum([c.get_dimensions()[0] for c in self.content]),
             max([c.get_dimensions()[1] for c in self.content]),
-            max([c.get_dimensions()[2] for c in self.content])            
-        )        
+            max([c.get_dimensions()[2] for c in self.content])
+        )
 
 
 class P5310(Component, DINAssembly):
@@ -150,15 +150,15 @@ class TempMeasurement:
         self.termistor = termistor
         self.converter = converter
 
-class TQS3:
+class TQS3(Component):
 
     type = 'TQS3'
     short = 'Teplotní senzor'
     power_supply_u = (10.0, 30.0)         # povolene napajeci napeti
     power_supply_i = (2.0e-3, 3.0e-3)     # max odber ze zdroje
 
-    def __init__(self):
-        pass
+    def __init__(self, label, spinel_address):
+        super().__init__(label)
 
     def get_power(self):
         try:
@@ -188,7 +188,8 @@ class Quido88(Component, DINAssembly):
     power_supply_i = (0.041, 0.283)
     dimensions = (137.4, 96.5, 20)
 
-    def __init__(self):
+    def __init__(self, label, spinel_address):
+        super().__init__(label)
         self.power_supply_u = self.allow_power_supply_u[1]
 
     def get_power(self):
@@ -220,6 +221,7 @@ class AD4ETH(Component, DINAssembly):
     power_supply_i = 170.0e-3
     size = (104.0e-3, 55.0e-3, 24.0e-3)
     input_range = (4.0e-3, 20.0e-3)
+    dimensions = (0.0 ,0.0 , 0.0)
 
     def __init__(self, label, ip, spinel_address=256):
         super().__init__(label)
@@ -289,7 +291,7 @@ class GNOME485(Component, DINAssembly):
     def draw_face_view(self, scheme):
         scheme.draw_rect(self.dimensions)
 
-class SENSYCON(Component):
+class SENSYCON(Component, DINAssembly):
 
     type = 'SENSYCON'
     short = 'PT100 to current converter'
@@ -297,6 +299,8 @@ class SENSYCON(Component):
     out_range = (4e-3, 20e-3)   # rozsah výstupních proudů [A]
     power_supply_u = 12.0
     power_supply_i = 20.0e-3
+    dimensions = (17.0, 62.0, 63.0)  # rozmery [mm]
+
 
     def __init__(self, label):
         super().__init__(label)
@@ -321,7 +325,7 @@ class Rele(Component, DINAssembly):
         scheme.draw_rect(self.dimensions)
         scheme.draw_rect((12.4, 29.0),'TINY')
 
-        
+
 
 class PC(Component):
 
@@ -364,14 +368,14 @@ class CabinetPosition:
     def draw_face_view(self, scheme):
         """ Namaluje celni pohled do daneho schematu. Pohled vykresli tak,
         že střed DIN lišty umístí na počátek souřadnicového systému. """
-        width = self.n_modules * MODULE_WIDTH
+        width = self.n_modules * Cabinet.MODULE_WIDTH
         scheme.draw_hline(-0.5 * width, 0.0, width, line='TINY')
         scheme.push()
         scheme.move(-0.5 * width, 0.0)
         for c in self.content:
-            scheme.move(0.5 * c.dimensions[0], 0.0)
+            scheme.move(0.5 * c.get_dimensions()[0], 0.0)
             c.draw_face_view(scheme)
-            scheme.move(0.5 * c.dimensions[0], 0.0)
+            scheme.move(0.5 * c.get_dimensions()[0], 0.0)
         scheme.pop()
 
     def put(self, module):
@@ -379,22 +383,25 @@ class CabinetPosition:
         self.content.append(module)
 
 
-class Cabinet:
+class Cabinet(Component):
 
     """ Jeden rozváděč, který může dále obsahovat více pozic s DIN lištou. """
 
     dimensions = (360.0, 540.0)
     n_positions = 3
     n_modules = (16, 16, 16)
+    MODULE_WIDTH = 17.5 # mm
+    VERTICAL_CONTENT_DISTANCE = 150.0 # mm
 
-    def __init__(self):
+    def __init__(self, label):
+        super().__init__(label)
         self.content = list([CabinetPosition(n) for n in self.n_modules])
 
     def draw_face_view(self, scheme):
         scheme.draw_rect(self.dimensions)
         scheme.push()
-        scheme.move(0.0, (self.n_positions-1) * VERTICAL_CONTENT_DISTANCE * 0.5)
+        scheme.move(0.0, (self.n_positions-1) * self.VERTICAL_CONTENT_DISTANCE * 0.5)
         for p in self.content:
             p.draw_face_view(scheme)
-            scheme.move(0.0, -VERTICAL_CONTENT_DISTANCE)
+            scheme.move(0.0, -self.VERTICAL_CONTENT_DISTANCE)
         scheme.pop()
