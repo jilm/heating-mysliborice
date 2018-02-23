@@ -2,6 +2,11 @@
 
 from schema.vector import I
 from schema.canvas import Canvas, Line, Circle, Square
+from schema.scheme import Scheme
+
+
+"""   Třídy použitých komponent. """
+
 
 components = {}
 terminals = {}
@@ -10,10 +15,8 @@ connections = list()
 def register(component):
     components[component.label] = component
 
-
 def get_component(label):
     return components[label]
-
 
 def register_connection(connection):
     connections.append(connection)
@@ -28,8 +31,9 @@ class ResistorGate(Gate):
 
 
 class Component:
-    """Common predecessor for each component. Label of each component must
-    be uniqe acros the project."""
+
+    """ Common predecessor for each component. Label of each component must
+    be uniqe acros the project. """
 
     type = 'Component'
     short = 'Komponenta systému topení.'
@@ -44,6 +48,15 @@ class Component:
     def get(self, key):
         return None
 
+class DINAssembly:
+
+    """ Abstraktní třída komponent určených pro montáž na lištu DIN. """
+
+    def get_dimensions(self):
+        return self.dimensions
+
+    def draw_face_view(self, scheme):
+        scheme.draw_rect(self.get_dimensions())
 
 class PT100(Component):
 
@@ -69,25 +82,42 @@ class PT100W4(Component):
         super().__init__(label)
 
 
-class Terminal(Component):
+class Terminal(Component, DINAssembly):
+
+    """ Jedna svorka. """
 
     type = "PT100"
     short = "Thermistor"
     label_base = "BT"
     terminals = (':1', ':2', ':3', ':4')
+    dimensions = (5.1, 60.0, 46.5)
 
     def __init__(self, label):
         super().__init__(label)
 
-class TerminalBlock(Component):
+
+class TerminalBlock(Component, DINAssembly):
+
+    """ Svorkovnice. """
 
     type = 'Terminal Block'
 
     def __init__(self, label):
         super().__init__(label)
+        self.content = list()
+
+    def append(self, terminal):
+        self.content.append(terminal)
+
+    def get_dimensions(self):
+        return (
+            sum([c.get_dimensions()[0] for c in self.content]),
+            max([c.get_dimensions()[1] for c in self.content]),
+            max([c.get_dimensions()[2] for c in self.content])
+        )
 
 
-class P5310(Component):
+class P5310(Component, DINAssembly):
 
     type = 'P5310'
     manufacturer = 'JSP'
@@ -120,15 +150,15 @@ class TempMeasurement:
         self.termistor = termistor
         self.converter = converter
 
-class TQS3:
+class TQS3(Component):
 
     type = 'TQS3'
     short = 'Teplotní senzor'
     power_supply_u = (10.0, 30.0)         # povolene napajeci napeti
     power_supply_i = (2.0e-3, 3.0e-3)     # max odber ze zdroje
 
-    def __init__(self):
-        pass
+    def __init__(self, label, spinel_address):
+        super().__init__(label)
 
     def get_power(self):
         try:
@@ -150,14 +180,16 @@ class TQS3:
             canvas.text('-', t.transform_point((1.0, 0.0)), 'ne', 'small')
         return t.r_move(-1.0, 0.0), t.r_move(1.0, 0.0)
 
-class Quido88(Component):
+class Quido88(Component, DINAssembly):
 
     type = 'Quido 8/8'
     short = 'Binary IOs and temperature measurement'
     allow_power_supply_u = (8.0, 30.0)
     power_supply_i = (0.041, 0.283)
+    dimensions = (137.4, 96.5, 20)
 
-    def __init__(self):
+    def __init__(self, label, spinel_address):
+        super().__init__(label)
         self.power_supply_u = self.allow_power_supply_u[1]
 
     def get_power(self):
@@ -172,7 +204,15 @@ class Quido88(Component):
             canvas.text('GND', t.transform_point((1.0, 0.0)), 'ne', 'small')
         return t.r_move(-1.0, 0.0), t.r_move(1.0, 0.0)
 
-class AD4ETH(Component):
+    def draw_face_view(self, scheme):
+        scheme.draw_rect(self.dimensions)
+        #scheme.draw_circl/e(3.2, (64.45, 40.0))
+        #scheme.draw_circle(3.2, (-64.45, 40.0))
+        #scheme.draw_circle(3.2, (64.45, -40.0))
+        #scheme.draw_circle(3.2, (-64.45, -40.0))
+
+
+class AD4ETH(Component, DINAssembly):
 
     type = 'AD4ETH'
     short = 'AD converter with ethernet connection'
@@ -181,6 +221,7 @@ class AD4ETH(Component):
     power_supply_i = 170.0e-3
     size = (104.0e-3, 55.0e-3, 24.0e-3)
     input_range = (4.0e-3, 20.0e-3)
+    dimensions = (0.0 ,0.0 , 0.0)
 
     def __init__(self, label, ip, spinel_address=256):
         super().__init__(label)
@@ -198,13 +239,14 @@ class AD4ETH(Component):
         return t.r_move(-1.0, 0.0), t.r_move(1.0, 0.0)
 
 
-class DA2RS(Component):
+class DA2RS(Component, DINAssembly):
 
     type = 'DA2RS'
     short = 'DA converter with RS485'
     channels = 2
     power_supply_u = (8.0, 30.0)
     power_supply_i = 90.0e-3
+    dimensions = (0.0 ,0.0 , 0.0)
 
     def __init__(self, label, spinel_address):
         super().__init__(label)
@@ -222,12 +264,13 @@ class DA2RS(Component):
             canvas.text('GND', t.transform_point((1.0, 0.0)), 'ne', 'small')
         return t.r_move(-1.0, 0.0), t.r_move(1.0, 0.0)
 
-class GNOME485(Component):
+class GNOME485(Component, DINAssembly):
 
     type = 'GNOME'
     short = 'RS485 to ETHERNET'
     power_supply_u = (9.0, 18.0)
     power_supply_i = 80.0e-3
+    dimensions = (42.0, 57.0, 25.0)
 
     def __init__(self, label, ip):
         super().__init__(label)
@@ -245,7 +288,10 @@ class GNOME485(Component):
             canvas.text('GND', t.transform_point((1.0, 0.0)), 'ne', 'small')
         return t.r_move(-1.0, 0.0), t.r_move(1.0, 0.0)
 
-class SENSYCON(Component):
+    def draw_face_view(self, scheme):
+        scheme.draw_rect(self.dimensions)
+
+class SENSYCON(Component, DINAssembly):
 
     type = 'SENSYCON'
     short = 'PT100 to current converter'
@@ -253,6 +299,8 @@ class SENSYCON(Component):
     out_range = (4e-3, 20e-3)   # rozsah výstupních proudů [A]
     power_supply_u = 12.0
     power_supply_i = 20.0e-3
+    dimensions = (17.0, 62.0, 63.0)  # rozmery [mm]
+
 
     def __init__(self, label):
         super().__init__(label)
@@ -261,16 +309,23 @@ class SENSYCON(Component):
         return self.power_supply_u * self.power_supply_i
 
 
-class Rele(Component):
+class Rele(Component, DINAssembly):
 
-    type = 'Rele'
+    type = 'Finder4031'
     short = 'Rele'
+    dimensions = (15.8, 78.6, 82.0)
 
     def __init__(self, label):
         super().__init__(label)
 
     def get_power(self):
         return 12.0 * 12.0 / 220.0
+
+    def draw_face_view(self, scheme):
+        scheme.draw_rect(self.dimensions)
+        scheme.draw_rect((12.4, 29.0),'TINY')
+
+
 
 class PC(Component):
 
@@ -288,3 +343,65 @@ class Wire:
         self.a = a
         self.b = b
         register_connection(self)
+
+class Valve(Component):
+
+    type = 'Valve'
+    short = 'Valve'
+
+    def write_schema_symbol(self, canvas = None, t = I):
+        if canvas is not None:
+            Line([(EQ_TRIANGLE_H, 0), (EQ_TRIANGLE_H, 1.0)], t).write(canvas)
+            Line([(-EQ_TRIANGLE_H, 0), (EQ_TRIANGLE_H, -1.0)], t).write(canvas)
+        return t.r_move(-0.5, 0.0), t.r_move(0.5, 0.0)
+
+class CabinetPosition:
+
+    """ Jedna pozice uvnitr rozvadece, jedna DIN lista. """
+
+    def __init__(self, n_modules):
+        """ Parametr n_modules je celociselna hodnota, kolik komponent,
+        s modulovou sirkou se da osadit na tuto DIN listu. """
+        self.n_modules = n_modules
+        self.content = list()
+
+    def draw_face_view(self, scheme):
+        """ Namaluje celni pohled do daneho schematu. Pohled vykresli tak,
+        že střed DIN lišty umístí na počátek souřadnicového systému. """
+        width = self.n_modules * Cabinet.MODULE_WIDTH
+        scheme.draw_hline(-0.5 * width, 0.0, width, line='TINY')
+        scheme.push()
+        scheme.move(-0.5 * width, 0.0)
+        for c in self.content:
+            scheme.move(0.5 * c.get_dimensions()[0], 0.0)
+            c.draw_face_view(scheme)
+            scheme.move(0.5 * c.get_dimensions()[0], 0.0)
+        scheme.pop()
+
+    def put(self, module):
+        """ Přidá jedenu komponentu. """
+        self.content.append(module)
+
+
+class Cabinet(Component):
+
+    """ Jeden rozváděč, který může dále obsahovat více pozic s DIN lištou. """
+
+    dimensions = (360.0, 540.0)
+    n_positions = 3
+    n_modules = (16, 16, 16)
+    MODULE_WIDTH = 17.5 # mm
+    VERTICAL_CONTENT_DISTANCE = 150.0 # mm
+
+    def __init__(self, label):
+        super().__init__(label)
+        self.content = list([CabinetPosition(n) for n in self.n_modules])
+
+    def draw_face_view(self, scheme):
+        scheme.draw_rect(self.dimensions)
+        scheme.push()
+        scheme.move(0.0, (self.n_positions-1) * self.VERTICAL_CONTENT_DISTANCE * 0.5)
+        for p in self.content:
+            p.draw_face_view(scheme)
+            scheme.move(0.0, -self.VERTICAL_CONTENT_DISTANCE)
+        scheme.pop()

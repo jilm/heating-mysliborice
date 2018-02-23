@@ -15,7 +15,7 @@ def write_table(head, content, caption = '', label = ''):
         '\\end{table}'
     ])
 
-with io.open('component_list.tex', 'w', encoding="utf-8") as file:
+with io.open('build/component_list.tex', 'w', encoding="utf-8") as file:
     file.write(write_table(
         None,
         [(key, '({}) {}'.format(objects[key].type, objects[key].short)) for key in objects],

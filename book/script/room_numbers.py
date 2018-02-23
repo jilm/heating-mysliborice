@@ -42,7 +42,7 @@ def write_table(head, content, caption = '', label = ''):
         '\\end{table}'
     ])
 
-with io.open('room_numbers.tex', 'w', encoding="utf-8") as file:
+with io.open('build/room_numbers.tex', 'w', encoding="utf-8") as file:
     file.write(write_table(
         None,
         #ROOM_NUMBERS,

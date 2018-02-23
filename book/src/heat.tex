@@ -20,8 +20,9 @@
 \chapter*{Scope}
 
     Tato dokumentace popisuje řízení topení v rodinném domě manželů Lidinských
-    v Myslibořicích. V kapitole xxx je popsáno topení, popis zapojení řídícího
-    systému je v kapitole xxx. Kapitola xxx pak obsahuje algoritmus řízení,
+    v~Myslibořicích. V~kapitole~\ref{chap:heating} je popis topeného systému,
+    popis zapojení řídícího systému je v~kapitole~\ref{chap:control}.
+    Kapitola~\ref{chap:algorithm} pak obsahuje algoritmus řízení,
     popis řídícího software je uveden v kapitole xxx. Na konci v příloze jsou
     vloženy katalogové listy jak komponent topení, tak komponent řídícího
     systému.
@@ -47,36 +48,55 @@
 
     Označení umístění, tedy označení místnosti uvnitř domu se skládá
     z~uvozovacího znaku plus a~trojciferného čísla. Přitom první číslice
-    je označení podlaží a druhá číslice specifikuje místnost. Podle podlaží
-    je dům členěn na přízemí a podkroví. Přízemí je označeno číslem jedna
-    a~podkroví číslicí dvě. Pokud potřebuji označit něco vně domu je použita
-    číslice nula. Číslování místností bylo převzato ze stavebního projektu.
-    Čísla místností jsou uvedena v tabulce~\ref{tab:room-numbers}
+    je označení podlaží a~druhé dvojčíslí specifikuje místnost. Podle podlaží
+    je dům členěn na přízemí a~podkroví. Přízemí je označeno číslem jedna
+    a~podkroví číslicí dvě. Číslování místností bylo převzato ze stavebního
+    projektu. Čísla místností jsou uvedena v tabulce~\ref{tab:room-numbers}
 
-    \input{room_numbers}
+    %\input{build/room_numbers}
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{rl|rl}
+            Celé přízemí.  & +100 & +101 & Kuchyně.\\
+            Obývací pokoj. & +102 & +103 & Ložnice I.\\
+            Ložnice II.    & +104 & +105 & Chodba.\\
+            Koupelna.      & +106 & +107 & Záchod.\\
+            Prádelna.      & +108 & +109 & Botník.\\
+            Zádveří.       & +110 & +111 & Schodiště.\\
+            Garáž.         & +112 & +200 & Celé podkroví.\\
+            Ložnice I.     & +201 & +202 & Ložnice II.\\
+            Kuchyň a jídelna. & +203 & +204 & Obývací pokoj.\\
+            Koupelna.      & +205 & +206 & Schodiště.\\
+            Venkovní prostor & +114 & +113 & Venkovní prostor\\
+            směrem do zahrady. & & & vstupních dveří.\\
+        \end{tabular}
+        \caption{Označení místností domu.}
+        \label{tab:room-numbers}
+    \end{table}
 
     Označení místností se používá pro prvky, nebo komponenty topení, které
-    se nacházejí přímo v dané místnosti.
-
+    se nacházejí přímo v dané místnosti, nebo se přímo k dané místnosti
+    vztahují. Typicky se jedná především o radiátory, tepelná čidla, nebo
+    teplotu v dané místnosti.
 
 \section{Funkční celky}
 
     Označení funkčního celku je uvozeno znakem rovnítka, které je následováno
-    kombinací číslic a písmen. Funkční celky se použijí pro provky nebo
+    kombinací číslic a~písmen. Funkční celky se použijí pro prvky nebo
     komponenty systému vytápění, které nemají přímý vztah k nějaké konkrétní
-    místnosti. Použité funkční celky jsou vyjmenovány
-    v~tabulce~\ref{tab:funkcni-celky}
+    místnosti, ale mají přímý vztah k nějakému podsystému technologie.
+    Použité funkční celky jsou vyjmenovány v~tabulce~\ref{tab:funkcni-celky}
 
     \begin{table}[h]
         \centering
         \begin{tabular}{r|l}
-        \textsf{=KK} & krbová kamna\\
-        \textdblhyphen KKA & vnitřní okruh krbových kamen\\
-        =KKB & vnější okruh krbových kamen\\
-        =OT & Soustava otopných těles\\
-        \textsf{=OT1} & Soustava otopných těles v přízemí\\
-        =OT2 & Soustava otopných těles v podkroví\\
-        =HP & Tepelné čerpadlo\\
+        =KK & Krbová kamna.\\
+        =KKA & Vnitřní okruh krbových kamen.\\
+        =KKB & Vnější okruh krbových kamen.\\
+        =OT & Soustava otopných těles.\\
+        =OT1 & Soustava otopných těles v přízemí.\\
+        =OT2 & Soustava otopných těles v podkroví.\\
+        =HP & Tepelné čerpadlo.\\
         \end{tabular}
     \caption{Výčet funkčních celků.}
     \label{tab:funkcni-celky}
@@ -85,28 +105,28 @@
 \section{Druh předmětu}
 
     Označení druhu předmětu je uvozeno pomlčkou, která je následována
-    písmenným symbolem a pořadovým číslem, je-li to nutné. Slouží k označení
+    kombinací písmen a pořadovým číslem, je-li to nutné. Slouží k označení
     konkrétního prvku, nebo komponenty sytému vytápění. Označení druhu
     předmětu je kombinováno buďto s označením místnosti, nebo funkčního
     celku, nebo stojí samostatně.
 
-    S~označením místnosti jsou svázány otopná tělesa. Takže, například,
-    radiátor v podroví v ložnici č I. je: +201-OT. Dalším prvkem, který
+    S~označením místnosti jsou svázána otopná tělesa. Takže, například,
+    radiátor v~podkroví v~ložnici~č\,I. je: +201-OT. Dalším prvkem, který
     je typicky svázán s označením místnosti je čidlo měření teploty. Takže
-    termostat, umístěný v přízemí v obývacím pokoji má označení: +102-TK.
+    termostat, umístěný v~přízemí v~obývacím pokoji má označení: +102-TK.
 
     S~označením dílčího celku se pojí prvky, které nelze jednoznačně přiřadit
-    ke konkrétní místnosti, ale přísluší jednoznačně k některému ze zdrojů
-    topné vody, nebo k otopným tělesům přízemí nebo pokroví. Tedy, motor
-    čerpadla vnitřního okruhu krbových kamen v podkroví nese označení
+    ke konkrétní místnosti, ale přísluší jednoznačně k~některému ze zdrojů
+    topné vody, nebo k~otopným tělesům přízemí nebo pokroví. Tedy, motor
+    čerpadla vnitřního okruhu krbových kamen v podkroví nese označení:
     =KKA-M.
 
-    Stejné označení jako u prvků řídícího systému se nepoužívá nikde jinde,
-    nehrozí proto záměna a typicky nejsou uvozeny jiným označením. Jsou to
-    například vstupně výstupní moduly -B1--6, nebo relé -K1--9, jističe
-    -FA1, FA2, ...
+    Identifikátor prvků řídícího systému stojí samostatně, není uvozen
+    ani označením dílčího celku, ani místnosti. Nehrozí zde záměna
+    s jiným prvkem systému. Například vstupně výstupní moduly -B1--6,
+    nebo relé -K1--9, jističe -FA1, FA2, \ldots
 
-    \input{component_list}
+    \input{build/component_list}
 
 \section{Označení svorky, přípojného místa}
 
@@ -117,24 +137,24 @@
 
     Signál je uvozen znakem středník, následuje označení fyzikální veličiny
     a je-li to nutné pak další rozlišovací znaky. Použité fyzikální veličiny
-    jsou uvedeny v tabulce~\ref(tab:fyzikalni-veliciny)
+    jsou uvedeny v tabulce~\ref{tab:fyzikalni-veliciny}
 
-    \begin{table}[]
+    \begin{table}[h]
         \centering
-        \begin{tabular}{l l l}
-            $T$ & $\rm K$ & Termodynamická teplota.\\
-            $t$ & $\oC$ & Teplota.\\
-            $\tau$ & $\rm s$ & Čas.\\
-            $Q$ & $\rm J$ & Teplo.\\
-            $U$ & $\rm V$ & Napětí.\\
-            $I$ & $\rm A$ & Proud.\\
-            $p$ & $\rm Pa$ & Tlak.\\
-            $F$ & $\rm m^3\,s^{-1}$ & Hmotnostní průtok.\\
-            $m$ & $\rm kg$ & Hmotnost.\\
-            $\rho$ & $\rm kg\,m^{-3}$ & Hustota.\\
-            $c$ & $\rm J\,kg^{-1}\,K^{-1}$ & Měrná tepelná kapacita.\\
-            $V$ & $\rm m^3$ & Objem.\\
-            $P$ & $\rm W$ & Výkon, příkon.\\
+        \begin{tabular}{rl}
+            $T$ & $[\rm K]$ Termodynamická teplota.\\
+            $t$ & $[\oC]$ Teplota.\\
+            $\tau$ & $[\rm s]$ Čas.\\
+            $Q$ & $[\rm J]$ Teplo.\\
+            $U$ & $[\rm V]$ Napětí.\\
+            $I$ & $[\rm A]$ Proud.\\
+            $p$ & $[\rm Pa]$ Tlak.\\
+            $F$ & $[\rm m^3\,s^{-1}]$ Hmotnostní průtok.\\
+            $m$ & $[\rm kg]$ Hmotnost.\\
+            $\rho$ & $[\rm kg\,m^{-3}]$ Hustota.\\
+            $c$ & $[\rm J\,kg^{-1}\,K^{-1}]$ Měrná tepelná kapacita.\\
+            $V$ & $[\rm m^3]$ Objem.\\
+            $P$ & $[\rm W]$ Výkon, příkon.\\
         \end{tabular}
         \caption{Označení použitých fyzikálních veličin.}
         \label{tab:fyzikalni-veliciny}
@@ -143,7 +163,7 @@
 \section{Alternativní značení}
 
     Uvedené značení bohužel nekoresponduje se značením v původním projektu
-    vytápění, je zde uvedena převodní tabulka mezi značením v původním
+    vytápění, proto je zde uvedena převodní tabulka mezi značením v původním
     projektu a mezi zde zavedeným značením. Bude-li někde dále v textu
     použito toto původní značení, uvedu na tomto místě upozornění.
 
@@ -188,8 +208,146 @@
   \label{tab:CSLabels}
 \end{table}
 
+\chapter{Systém topení}\label{chap:heating}
 
-\chapter{Řídící systém}
+    Během dostavby obytného podkroví, byla doplněna krbová kamna, HAASON+SOHN,
+
+    \begin{tikzpicture}
+        \input{build/blockdiagram}
+    \end{tikzpicture}
+
+Původní vytápění bylo postaveno na tepelném čerpadle. V přízemí se topí do
+podlahového topení. Pro nucenou cirkulaci vody se používám čerpadlo =OT1-P.
+K regulaci teploty je v místnosti +102 osazen termostat s označením
+xxx. Tento termostat má kontaktní výstup s spínal přímo čerpadlo =OT1-P.
+Blokové schema je na obrázku xxx.
+
+S dostavbou podkoroví, byla osazena krbová kamna xxx a radiátory v podkroví.
+Krbová kamna mají vnitřní smyčku s čerpadlem =KK-P a termostatickým
+směšovacím ventilem =KK-VM. Tato vnitřní smyčka zajistí, že nejdříve
+se topná voda nahřeje na 60 xxx a až poté se pustí do radiátorů.
+Cílem je prodloužení životnosti krbových kamen. Aby bylo možné pouštět
+topnou vodu i do podlahového topení v přízemí, musel být okruh topení
+osazen směšovacím ventilem =OT2-VM. Nucenou cirkulaci v otopných tělesech
+v podkroví zajišťuje čerpadlo =OT2-P. Schematický diagram je na obrázku xxx.
+
+Oba okruhy jsou propojeny, tak aby bylo možné kombinovat zdroje topné vody
+a otopná tělesa přízemí a podkroví. Volba vytápěcího režimu se provádí
+otevřením, zavřením jednotlivých solenoidových ventilů. Kompletní schematický
+diagram je na obrázku xxx. Kompletní schema vytápěcího systému je na
+xxx.
+
+V následujících kapitolách jsou uvedeny hlavní parametry jednotlivých
+komponent vytápění. 
+
+
+  \section{Kotel}
+
+    Použita jsou \index{krbová kamna} HAAS+SOHN typ \index{Tanaga} s výkonem
+    $3{,}5$ -- $15\:\rm kW$, maximální teplota
+    výstupní vody je \degC{80}, doporučený tepelný spád je \degC{75-60}, obsah
+    tepelného výměníku je $29{,}5\:\rm l$. Více viz katalogový list na straně
+    \pageref{apx:kotel}
+
+  \section{Plnící směšovací ventil}
+
+    Pro zabránění kondenzace a tím rezavění kotle je na studené větvi kotle
+    osazen termostatický směšovací ventil ESBE VTC 318, DN 20, \degC{60}.
+    Ventil obsahuje termostat, který začíná otvírat vstup A při teplotě výstupní 
+    (smíchané) vody ve výstupu AB \degC{60}. Když teplota ve vstupu A překročí
+    jmenovitou teplotu o \degC{10}, vstup B je úlně uzavřen.
+    $\rm Kvs = 3{,}2\: m^3\, h^{-1}$. Ventil bude dále v textu označován jako
+    \SVA, zdvih ventilu budu označovat $h_1 \in \langle 0, 1 \rangle$. 
+
+  \section{Směšovací ventil}
+
+    K regulaci teploty do radiátorů je osazen směšovací ventil ESBE VRG 131,
+    DN 20, $\rm Kvs = 6{,}3\: m^3\, h^{-1}$. Ventil bude dále v textu označen
+    jako \SVB, zdvih bude označován jako $h_2 \in \langle 0, 1 \rangle$.
+    Charakteristika ventilu, tedy závislost mezi zdvihem a procentuálním
+    průtokem je dána ve formě grafu. Zdá se, že charakteristiku bude možné
+    aproximovat goniometrickými funkcemi.
+    $$\frac{F}{F_0} = \half + \half \cos\left(\frac{h}{h_0} \pi\right).$$
+
+    Ventil je osazen elektropohonem ESBE ARA 639. Tento pohon otevře z jedné
+    polohy do druhé za 15, 30, 60, 120 s. (TODO nutno ověřit).
+
+  \section{Čerpadlo}
+
+    Je použito čerpadlo Grundfos ALPHA2 L 15-40 130. Vztah mezi tlakem
+    a průtokem je dán ve formě grafu. Zkusme aproximovat charakteristiku
+    polynomem druhého řádu.
+
+    \begin{figure}[hp]
+      \centering
+      \caption{Závislost tlaku na průtoku u čerpadel Grundfos ALPHA}
+    \end{figure}
+
+    \begin{equation}
+    \end{equation}
+
+    kde $p$ je tlak v Pa a $F$ je průtok v $\rm kg\,s^{-1}$.
+
+  \section{Radiátory}
+
+    Jsou použity radiátory značky KORADO pravděpodobně typ RADIK KLASIK.
+    Následují vybrané parametry z katalogového listu \cite{radik}. Osazeny
+    jsou čtyři radiátory, o rozměrech uvedených v následující tabulce:
+
+    \begin{table}[hb]
+      \centering
+        \begin{tabular}{cccc}
+          L [mm] & H [mm] & Typ \\
+          \hline
+          2000 & 600 & 21 & +201\\
+          2000 & 600 & 21 & +202\\
+          1400 & 600 & 21 & +203\\
+          2000 & 600 & 22 & +204
+        \end{tabular}
+      \caption{Rozměry použitých radiátorů}
+    \end{table}
+
+    Následují další vybrané parametry:
+
+    \begin{table}[h]
+      \centering
+        \begin{tabular}{l|r@{,}lr@{,}ll|lr}
+          & Typ 21 & Typ 22\\
+          \hline
+          Jmenovitý tepelný výkon &  1&288    & 1&452   & $\rm kW m^{-1}$\\
+          Teplotní exponent $n$   &  1&3319   & 1&3353  & $\rm -$\\
+          $K_T$                   &  0&033993 & 0&05120 \\
+          $c_0$                   &  1&3505   & 1&3438\\
+          $b$                     &  0&8309   & 0&8055\\
+          $c_1$                   & -0&00002395 & -0&00000514\\
+          Hmotnost tělesa         &  26&4     & 31&1    & $\rm [l m^-1]$\\
+          Vodní objem             &  5&8      & 5&8     & $\rm [l m^-1]$\\
+          Průtokový součinitel    &  1&$\dot 10^{-4}$ & $10^{-4}$ & $A_T$\\
+          Součinitel odporu $\epsilon$ & 8&5 & 8&5\\
+        \end{tabular}
+      \caption{Vybrané paramtery radiátorů}
+    \end{table}
+
+    Více viz katalogový list.
+
+
+
+\begin{table}
+      \centering
+      \begin{tabular}{ccccccccc}
+        $C_1$ & $C_2$ & $C_3$ & $V_1$ & $V_2$ & $V_3$ & $V_4$ & $V_5$ & $V_6$\\
+        \hline
+        on    & on    &       & on    & off   &       & on    & off   & off\\
+        on    & on    & on    & on    & off   & on    & on    & on    & off\\
+              &       & on    &       &       & on    &       & off   & off\\
+        off   & on    & on    & off   & off   & on    & off   & off   & on\\
+        on    & on    &       & on    & on    &       & on    & off   & off\\
+        off   & on    &       & off   & on    &       & on    & off   & off\\
+        off   & on    & off   & off   & off   & off   & off   & off   & on
+      \end{tabular}
+\end{table}
+
+\chapter{Řídící systém}\label{chap:control}
 
     Řídící systém je realizován běžným počítačm typu PC s OS Linux, na kterém
     běží program, který v nekonečné smyčce provádí řídící alogritmus. Program
@@ -285,7 +443,7 @@
 
         \begin{figure}\centering
             \begin{tikzpicture}
-                \input{bo}
+                \input{build/bo}
             \end{tikzpicture}
             \caption{Typové zapojení binárních výstupů modulu Quido.}
             \label{fig:binary-out}
@@ -293,7 +451,7 @@
 
         \cite{da2rs}
 
-    \chapter{Algoritmus}
+    \chapter{Algoritmus řízení}\label{chap:algorithm}
 
         Z teploty kotle jsou odvozeny tři binární signály, jak je vidět z
         následujícího obrázku.
@@ -305,7 +463,19 @@
             \caption{Vyhodnocení teploty na výstupu z krbových kamen.}
         \end{figure}
 
+    \chapter{Trocha fyziky}\label{chap:theory}
+
+    \chapter{Analýza naměřených dat}\label{chap:analyze}
+
+    \chapter{Budoucí vylepšení}\label{chap:future-improvements}
+
+    \chapter{Údržba}\label{chap:maintenance}
+
 \appendix
+
+    \chapter{Schemata}
+
+    \chapter{Katalogové listy}
 
 \backmatter
 
