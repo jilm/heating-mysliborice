@@ -17,8 +17,6 @@ ROOM_NUMBERS = [
     ('+110', 'Zádveří.'),
     ('+111', 'Schodiště.'),
     ('+112', 'Garáž.'),
-    ('+113', 'Venkovní prostor vstupních dveří.'),
-    ('+114', 'Venkovní prostor směrem do zahrady.'),
     ('+200', 'Celé podkroví.'),
     ('+201', 'Ložnice I.'),
     ('+202', 'Ložnice II.'),
@@ -26,19 +24,21 @@ ROOM_NUMBERS = [
     ('+204', 'Obývací pokoj.'),
     ('+205', 'Koupelna.'),
     ('+206', 'Schodiště.'),
-    ('+207', 'Technická místnost.')
-
+    ('+207', 'Technická místnost.'),
+    ('+113', 'Venkovní prostor vstupních dveří.'),
+    ('+114', 'Venkovní prostor směrem do zahrady.'),
+    ('', '')
 ]
 
 def write_table(head, content, caption = '', label = ''):
     return '\n'.join([
         '\\begin{table}[h]',
-        '\\begin{tabular}',
         '\\centering',
+        '\\begin{tabular}{rl|rl}',
         '\\\\\n'.join([' & '.join(row) for row in content]),
+        '\\end{tabular}',
         '\\caption{{{}}}'.format(caption),
         '\\label{{{}}}'.format(label),
-        '\\end{tabular}',
         '\\end{table}'
     ])
 
