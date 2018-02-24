@@ -15,8 +15,15 @@ from schema.scheme import ScaledScheme
 # Vykreslí vlastní výkres
 
 canvas = StandaloneCanvas()
-scheme = ScaledScheme(canvas, scale=0.5, paper='A3P')
+scheme = ScaledScheme(canvas, scale=0.5, paper='A3P',
+    description = {
+        'name' : 'Disp. uspořádání rozváděče =A1',
+        'number' : 'HM-A1-DISP'
+    }
+)
 
 a1 = get_component('=A1')
 a1.draw_face_view(scheme)
+scheme.move(-75.0, -125.0)
+scheme.draw_rect((150.0, 230.0))
 canvas.close()

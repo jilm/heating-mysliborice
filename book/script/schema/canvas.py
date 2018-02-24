@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Writes a Tikz output."""
+""" Writes a Tikz output. """
 
 import functools
 import sys
@@ -22,7 +22,8 @@ text_positions = {
 TEXT_SIZE = {
     'normal': '',
     'small': '\small',
-    'large': '\large'
+    'large': '\large',
+    'huge' : '\huge'
 }
 
 
@@ -38,6 +39,8 @@ class Transformable:
 
 class Canvas(Writable):
 
+    """ Writes TIKZ output on std out. """
+
     def __init__(self):
         self.writables = Queue()
         self.unit=''
@@ -52,14 +55,18 @@ class Canvas(Writable):
         self.line_width = width
 
     def open(self):
+        """ It is called before the first character is written on the output. """
         self.opened = True
 
     def close(self):
+        """ Should be called after the picture is finished. """
         if not self.opened:
             self.open()
         self.closed = True
 
     def write(self, text):
+        """ Some kind of low level method. It is not inteded for direct use,
+        it is called internaly. """
         if not self.opened:
             self.open()
         sys.stdout.write(text)
@@ -71,13 +78,10 @@ class Canvas(Writable):
         self.write(' -- {}'.format(self.form_point(x, y)))
 
     def arc_to(self, angle1, angle2, radius):
-        self.write(' arc ({}:{}:{}{}'.format(angle1, angle2, radius, self.unit))
+        self.write(' arc ({}:{}:{}{})'.format(angle1, angle2, radius, self.unit))
 
     def close_path(self):
         self.write('-- cycle;')
-
-    def get_draw_params(self):
-        return 'line width={}{}'.format(self.line_width, self.unit)
 
     def line(self, points):
         """
@@ -86,7 +90,7 @@ class Canvas(Writable):
         """
         form = ('({0}{2},{1}{2})'.format(x, y, self.unit) for x, y in points)
         concat = functools.reduce(lambda a, b: '{} -- {}'.format(a, b), form)
-        self.write('\draw[{1}] {0};'.format(concat, self.get_draw_params()))
+        self.write('\draw[{1}] {0};'.format(concat, self.form_draw_params()))
 
     def closed_line(self, points):
         """
@@ -96,7 +100,7 @@ class Canvas(Writable):
         """
         form = ('({0}{2},{1}{2})'.format(x, y, self.unit) for x, y in points)
         concat = functools.reduce(lambda a, b: '{} -- {}'.format(a, b), form)
-        self.write('\draw[{1}] {0} -- cycle;'.format(concat, self.get_draw_params()))
+        self.write('\draw[{1}] {0} -- cycle;'.format(concat, self.form_draw_params()))
 
     def text(self, text, point, position=None, size=None):
         """Draw given text at given position."""
@@ -118,10 +122,23 @@ class Canvas(Writable):
                                             y + height), (x, y + height), (x, y)))
 
     def circle(self, x, y, radius):
-        self.write('\draw ({},{}) circle ({});'.format(x, y, radius))
+        self.write('\draw {} circle ({}{});'.format(self.form_point(x, y),
+        radius, self.unit))
 
     def form_point(self, x, y):
+        """ For internal use, it returns tikz string representation of the
+        given coordinates. """
         return '({0}{2},{1}{2})'.format(x, y, self.unit)
+
+    def form_points(self, points):
+        form = (self.form_point(x, y) for x, y in points)
+        return ' -- '.join(form)
+
+    def form_draw_params(self):
+        """ For internal use, it returns tikz string representation of the
+        draw parameters. """
+        return 'line width={}{}'.format(self.line_width, self.unit)
+
 
 #canvas = Canvas()
 
@@ -154,8 +171,8 @@ class StandaloneCanvas(Canvas):
 # of the rest of the tuple.
 class Path:
 
-    def __init__(self):
-        self.path = list()
+    def __init__(self, path=list()):
+        self.path = path
 
     def transform(self, transform):
         for i, seg in enumerate(self.path):

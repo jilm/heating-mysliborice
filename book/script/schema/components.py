@@ -3,6 +3,8 @@
 from schema.vector import I
 from schema.canvas import Canvas, Line, Circle, Square, Path
 from schema.scheme import Scheme
+import itertools
+from schema.symbols import EQ_TRIANGLE_H
 
 
 """   Třídy použitých komponent. """
@@ -50,7 +52,9 @@ class Component:
 
 class DINAssembly:
 
-    """ Abstraktní třída komponent určených pro montáž na lištu DIN. """
+    """ Base class for components that are dedicated to DIN assembly. """
+
+    dimensions = (0.0, 0.0, 0.0)
 
     def get_dimensions(self):
         return self.dimensions
@@ -144,6 +148,24 @@ class P5310(Component, DINAssembly):
     def get_power(self):
         return self.power_supply_u * self.power_supply_i
 
+    def draw_face_view(self, scheme):
+        scheme.draw_rect((12.4, 62))
+        Line(
+            ((6.2, 24.26), (8.5, 24.26), (8.5, -24.26), (6.2, -24.26)),
+            scheme.t
+        ).write(scheme.canvas)
+        Line(
+            ((-6.2, 24.26), (-8.5, 24.26), (-8.5, -24.26), (-6.2, -24.26)),
+            scheme.t
+        ).write(scheme.canvas)
+        Line(((-6.2, 18.38), (6.2, 18.38)), scheme.t).write(scheme.canvas)
+        Line(((-6.2, -18.38), (6.2, -18.38)), scheme.t).write(scheme.canvas)
+        scheme.draw_rect((10.85, 35.28), 'TINY')
+        scheme.draw_circle(2.325, cx=-2.7125, cy=31.0-2.725)
+        scheme.draw_circle(2.325, cx=2.7125, cy=31.0-2.725)
+        scheme.draw_circle(2.325, cx=-2.7125, cy=-31.0+2.725)
+        scheme.draw_circle(2.325, cx=2.7125, cy=-31.0+2.725)
+
 class TempMeasurement:
 
     def __init__(self, termistor, converter):
@@ -221,7 +243,7 @@ class AD4ETH(Component, DINAssembly):
     power_supply_i = 170.0e-3
     size = (104.0e-3, 55.0e-3, 24.0e-3)
     input_range = (4.0e-3, 20.0e-3)
-    dimensions = (0.0 ,0.0 , 0.0)
+    dimensions = (55.0 ,104.0 , 24.0)
 
     def __init__(self, label, ip, spinel_address=256):
         super().__init__(label)
@@ -246,7 +268,7 @@ class DA2RS(Component, DINAssembly):
     channels = 2
     power_supply_u = (8.0, 30.0)
     power_supply_i = 90.0e-3
-    dimensions = (0.0 ,0.0 , 0.0)
+    dimensions = (55.0 ,104.0 , 24.0)
 
     def __init__(self, label, spinel_address):
         super().__init__(label)
@@ -355,6 +377,9 @@ class Valve(Component):
             Line([(-EQ_TRIANGLE_H, 0), (EQ_TRIANGLE_H, -1.0)], t).write(canvas)
         return t.r_move(-0.5, 0.0), t.r_move(0.5, 0.0)
 
+class Glue(DINAssembly):
+    pass
+
 class CabinetPosition:
 
     """ Jedna pozice uvnitr rozvadece, jedna DIN lista. """
@@ -366,20 +391,29 @@ class CabinetPosition:
         self.content = list()
 
     def draw_face_view(self, scheme):
-        """ Namaluje celni pohled do daneho schematu. Pohled vykresli tak,
-        že střed DIN lišty umístí na počátek souřadnicového systému. """
-        # draw axe
+        """ Draw dhe face view into the given schema. The center of the
+        drawing will be placed into the center of the coordinates system.
+        """
+        # draw the axis
         width = self.n_modules * Cabinet.MODULE_WIDTH
         scheme.draw_hline(-0.5 * width, 0.0, width, line='TINY')
-        # draw particular components
+        # find the size of the whole drawing
+        height = max([c.get_dimensions()[1] for c in self.content])
+        occupied_width = sum([c.get_dimensions()[0] for c in self.content])
+        n_glue = len([c for c in self.content if isinstance(c, Glue)])
         scheme.push()
         max_height = max([c.get_dimensions()[1] for c in self.content])
         scheme.move(-0.5 * width, 0.0)
         for c in self.content:
-            scheme.move(0.5 * c.get_dimensions()[0], 0.0)
-            c.draw_face_view(scheme)
-            scheme.canvas.text(c.label, (0, max_height))
-            scheme.move(0.5 * c.get_dimensions()[0], 0.0)
+            if isinstance(c, Glue):
+                scheme.move((width - occupied_width) / n_glue, 0.0)
+            else:
+                scheme.move(0.5 * c.get_dimensions()[0], 0.0)
+                c.draw_face_view(scheme)
+                # draw the label
+                scheme.canvas.text(c.label, scheme.t.transform_point((0, 0.5 *
+                height)), position = 'n')
+                scheme.move(0.5 * c.get_dimensions()[0], 0.0)
         scheme.pop()
 
     def put(self, module):
@@ -396,6 +430,7 @@ class Cabinet(Component):
     n_modules = (16, 16, 16)
     MODULE_WIDTH = 17.5 # mm
     VERTICAL_CONTENT_DISTANCE = 150.0 # mm
+    content_y = (120.0, 270.0, 420.0)
 
     def __init__(self, label):
         super().__init__(label)
@@ -404,11 +439,30 @@ class Cabinet(Component):
     def draw_face_view(self, scheme):
         # outer frame of the cabinet
         scheme.draw_rect(self.dimensions)
-        path = Path()
-        path.move_to((0.0, 0.0))
-        path.line_to([0.5 * d for d in self.dimensions])
+        x, y = [0.5 * d - 4.0 for d in self.dimensions]
+        path = Path(
+            [
+                ('M', x-36.0, y), ('L', -x+36.0, y),
+                ('L', -x+36.0, y-13.0), ('A', 0.0, -90.0, 10.0),
+                ('L', -x, y-23.0), ('L', -x, -y+23.0),
+                ('L', -x+26.0, -y+23.0), ('A', 90.0, 0.0, 10.0),
+                ('L', -x+36.0, -y), ('L', x-36.0, -y),
+                ('L', x-36.0, -y+13.0), ('A', 180.0, 90.0, 10.0),
+                ('L', x, -y+23.0), ('L', x, y-23.0),
+                ('L', x-26.0, y-23.0), ('A', 270.0, 180.0, 10.0)
+            ]
+        )
         path.transform(scheme.t)
         path.write(scheme.canvas)
+        # draw dimensions
+        x, y = (0.5 * d for d in self.dimensions)
+        scheme.draw_hdimension(((-x, y), (x, y)), y + 10)
+        scheme.draw_vdimension(((-x, y), (-x, -y)), -x - 20)
+        scheme.draw_vdimension(
+            [(-x, -cy+y) for cy in itertools.chain((0, ), self.content_y)],
+            -x - 10
+        )
+        # draw content of the cabinet
         scheme.push()
         scheme.move(0.0, (self.n_positions-1) * self.VERTICAL_CONTENT_DISTANCE * 0.5)
         for p in self.content:

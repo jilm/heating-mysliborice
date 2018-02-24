@@ -34,9 +34,34 @@ LINE_WIDTHS = {
     'BOLD' : 0.5
 }
 
+STYLE = {
+    'aux' : {
+        'line_width' : LINE_WIDTHS['TINY'],
+        'line' : 'dashed',
+    },
+    'normal' : {
+        'line_width' : LINE_WIDTHS['NORMAL'],
+    },
+    'bold' : {
+        'line_width' : LINE_WIDTHS['NORMAL'],
+    },
+    'filled' : {
+        'filled' : True,
+    },
+    'warning' : {
+        'line_width' : LINE_WIDTHS['TINY'],
+        'line' : 'dashed',
+        'color' : 'red'
+    },
+    'axis' : {
+        'line_width' : LINE_WIDTHS['TINY'],
+        'line' : 'dashed',
+    }
+}
+
 class Scheme:
 
-    def __init__(self, canvas, paper='A3L'):
+    def __init__(self, canvas, paper='A3L', description=None):
         self.canvas = canvas
         self.canvas.setPaperSize(PAPERS[paper]['RAW_PAPER_SIZE'])
         self.canvas.unit = 'mm'
@@ -44,6 +69,7 @@ class Scheme:
         self.paper = PAPERS[paper]
         self.t = I
         self.t_stack = list()
+        self.description = description
         self.draw_frame()
 
     def push(self):
@@ -67,8 +93,61 @@ class Scheme:
         self.canvas.set_line_width(LINE_WIDTHS[line])
         Line(((x, y), (x, y+size)), self.t).write(self.canvas)
 
-    def draw_circle(self, r, x, y):
-        pass
+    def draw_circle(self, radius, cx=0.0, cy=0.0):
+        c = self.t.transform_point((cx, cy))
+        r = self.t.transform_vector((radius, radius))[0]
+        self.canvas.circle(c[0], c[1], r)
+
+    def draw_hdimension(self, points, y):
+        # draw auxiliary lines
+        self.canvas.set_line_width(LINE_WIDTHS['TINY'])
+        aux_points = [((x1, y1+2.0), (x1, y+2.0)) for x1, y1 in points]
+        for p in aux_points:
+            Line(p, self.t).write(self.canvas)
+        # draw dimension line
+        Line(((points[0][0], y), (points[-1][0], y)), self.t).write(self.canvas)
+        # draw dimension mark
+        for p in [(x, y) for x, _ in points[1:]]:
+            self.draw_dimension_mark(self.t.r_move(p[0], p[1]))
+        for p in [(x, y) for x, _ in points[0:-1]]:
+            self.draw_dimension_mark(self.t.r_move(p[0], p[1]).r_scale(-1.0, 1.0))
+        # write a dimension
+        for i in range(len(points)-1):
+            x1 = points[i][0]
+            x2 = points[i+1][0]
+            dim = x2 - x1
+            self.canvas.text('{}'.format(dim), self.t.transform_point((0.5 *
+            (x1 + x2), y)), 'n')
+
+    def draw_vdimension(self, points, x):
+        # draw auxiliary lines
+        self.canvas.set_line_width(LINE_WIDTHS['TINY'])
+        aux_points = [((x1-2.0, y1), (x-2.0, y1)) for x1, y1 in points]
+        for p in aux_points:
+            Line(p, self.t).write(self.canvas)
+        # draw dimension line
+        Line(((x, points[0][1]), (x, points[-1][1])), self.t).write(self.canvas)
+        # draw dimension mark
+        for p in [(x, y) for _, y in points[1:]]:
+            self.draw_dimension_mark(self.t.r_move(p[0], p[1]).rotate_vect())
+        for p in [(x, y) for _, y in points[0:-1]]:
+            self.draw_dimension_mark(
+                self.t.r_move(p[0], p[1]).r_scale(-1.0, 1.0).rotate_vect()
+            )
+        # write a dimension
+        for i in range(len(points)-1):
+            y1 = points[i][1]
+            y2 = points[i+1][1]
+            dim = y2 - y1
+            self.canvas.text(
+                '{}'.format(dim),
+                self.t.transform_point((x, 0.5 * (y1 + y2))),
+                'w'
+            )
+
+
+    def draw_dimension_mark(self, t):
+        Line(((-4.0, 1.37), (0.0, 0.0), (-4.0, -1.37)), t).write(self.canvas)
 
     def draw_frame(self):
         # Vykres velikosti A3
@@ -161,9 +240,21 @@ class Scheme:
             0.5 * (DESC_FIELD_SIZE[1] - drawing_frame_size[1])
         )
         self.draw_rect(DESC_FIELD_SIZE)
-        self.pop()
-        # Nazev vykresu
-        # Cislo vykresu
+        if self.description is not None:
+            # Cislo vykresu
+            if 'number' in self.description:
+                self.canvas.text(
+                    self.description['number'],
+                    self.t.transform_point((0, 0)),
+                    size='huge'
+                )
+            # Nazev vykresu
+            if 'name' in self.description:
+                self.canvas.text(
+                    self.description['name'],
+                    self.t.transform_point((0, -10)),
+                    size='huge'
+                )
         # List / listu
         # Projekt
         # Realizator
@@ -173,6 +264,7 @@ class Scheme:
         # datum
         # meritko
         # zmenove pole
+        self.pop()
         # Move drawing coordinates
         self.move(0.0, 0.5 * DESC_FIELD_SIZE[1])
 
@@ -181,8 +273,8 @@ class Scheme:
 
 class ScaledScheme(Scheme):
 
-    def __init__(self, canvas, scale=1.0, paper='A3L'):
-        Scheme.__init__(self, canvas, paper=paper)
+    def __init__(self, canvas, scale=1.0, paper='A3L', description=None):
+        Scheme.__init__(self, canvas, paper=paper, description=description)
         self.scale = scale
         self.t = self.t.r_scale(scale, scale)
 

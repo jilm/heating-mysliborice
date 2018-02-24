@@ -131,7 +131,7 @@ a1.content[0].put(get_component('-B2')) # Quido
 
 for i in range(9): # Vystupni rele K1-9
     a1.content[1].put(get_component('-K{}'.format(i+1)))
-
+a1.content[1].put(comp.Glue())
 a1.content[1].put(get_component('-B7')) # P5310
 a1.content[1].put(get_component('-B6')) # Sensycon
 a1.content[1].put(get_component('-B5')) # Gnome 485
@@ -146,6 +146,7 @@ for i in range(10):
     x2.append(comp.Terminal('=A1-X2:{}'.format(i+1)))
 a1.content[2].put(x2)
 # X3
+a1.content[2].put(comp.Glue())
 x3 = comp.TerminalBlock('=A1-X3')
 for i in range(4):
     x3.append(comp.Terminal('=A1-X3:{}'.format(i+1)))
