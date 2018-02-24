@@ -22,7 +22,8 @@ text_positions = {
 TEXT_SIZE = {
     'normal': '',
     'small': '\small',
-    'large': '\large'
+    'large': '\large',
+    'huge' : '\huge'
 }
 
 
@@ -118,7 +119,8 @@ class Canvas(Writable):
                                             y + height), (x, y + height), (x, y)))
 
     def circle(self, x, y, radius):
-        self.write('\draw ({},{}) circle ({});'.format(x, y, radius))
+        self.write('\draw {} circle ({}{});'.format(self.form_point(x, y),
+        radius, self.unit))
 
     def form_point(self, x, y):
         """ For internal use, it returns tikz string representation of the
@@ -128,8 +130,6 @@ class Canvas(Writable):
     def form_points(self, points):
         form = (form_point(x, y) for x, y in points)
         return ' -- '.join(form)
-        
-    
 
     def form_draw_params(self):
         """ For internal use, it returns tikz string representation of the

@@ -3,6 +3,7 @@
 from schema.vector import I
 from schema.canvas import Canvas, Line, Circle, Square
 from schema.scheme import Scheme
+import itertools
 
 
 """   Třídy použitých komponent. """
@@ -143,6 +144,24 @@ class P5310(Component, DINAssembly):
 
     def get_power(self):
         return self.power_supply_u * self.power_supply_i
+
+    def draw_face_view(self, scheme):
+        scheme.draw_rect((12.4, 62))
+        Line(
+            ((6.2, 24.26), (8.5, 24.26), (8.5, -24.26), (6.2, -24.26)),
+            scheme.t
+        ).write(scheme.canvas)
+        Line(
+            ((-6.2, 24.26), (-8.5, 24.26), (-8.5, -24.26), (-6.2, -24.26)),
+            scheme.t
+        ).write(scheme.canvas)
+        Line(((-6.2, 18.38), (6.2, 18.38)), scheme.t).write(scheme.canvas)
+        Line(((-6.2, -18.38), (6.2, -18.38)), scheme.t).write(scheme.canvas)
+        scheme.draw_rect((10.85, 35.28), 'TINY')
+        scheme.draw_circle(2.325, cx=-2.7125, cy=31.0-2.725)
+        scheme.draw_circle(2.325, cx=2.7125, cy=31.0-2.725)
+        scheme.draw_circle(2.325, cx=-2.7125, cy=-31.0+2.725)
+        scheme.draw_circle(2.325, cx=2.7125, cy=-31.0+2.725)
 
 class TempMeasurement:
 
@@ -366,15 +385,22 @@ class CabinetPosition:
         self.content = list()
 
     def draw_face_view(self, scheme):
-        """ Namaluje celni pohled do daneho schematu. Pohled vykresli tak,
-        že střed DIN lišty umístí na počátek souřadnicového systému. """
+        """ Draw dhe face view into the given schema. The center of the
+        drawing will be placed into the center of the coordinates system.
+        """
+        # draw the axis
         width = self.n_modules * Cabinet.MODULE_WIDTH
         scheme.draw_hline(-0.5 * width, 0.0, width, line='TINY')
+        # find the size of the whole drawing
+        height = max([c.get_dimensions()[1] for c in self.content])
         scheme.push()
         scheme.move(-0.5 * width, 0.0)
         for c in self.content:
             scheme.move(0.5 * c.get_dimensions()[0], 0.0)
             c.draw_face_view(scheme)
+            # draw the label
+            scheme.canvas.text(c.label, scheme.t.transform_point((0, 0.5 *
+            height)), position = 'n')
             scheme.move(0.5 * c.get_dimensions()[0], 0.0)
         scheme.pop()
 
@@ -392,13 +418,24 @@ class Cabinet(Component):
     n_modules = (16, 16, 16)
     MODULE_WIDTH = 17.5 # mm
     VERTICAL_CONTENT_DISTANCE = 150.0 # mm
+    content_y = (120.0, 270.0, 420.0)
 
     def __init__(self, label):
         super().__init__(label)
         self.content = list([CabinetPosition(n) for n in self.n_modules])
 
     def draw_face_view(self, scheme):
+        # outer frame of the cabinet
         scheme.draw_rect(self.dimensions)
+        # draw dimensions
+        x, y = (0.5 * d for d in self.dimensions)
+        scheme.draw_hdimension(((-x, y), (x, y)), y + 10)
+        scheme.draw_vdimension(((-x, y), (-x, -y)), -x - 20)
+        scheme.draw_vdimension(
+            [(-x, -cy+y) for cy in itertools.chain((0, ), self.content_y)],
+            -x - 10
+        )
+        # draw content of the cabinet
         scheme.push()
         scheme.move(0.0, (self.n_positions-1) * self.VERTICAL_CONTENT_DISTANCE * 0.5)
         for p in self.content:
