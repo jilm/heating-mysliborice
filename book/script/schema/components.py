@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from schema.vector import I
-from schema.canvas import Canvas, Line, Circle, Square
+from schema.canvas import Canvas, Line, Circle, Square, Path
 from schema.scheme import Scheme
 
 
@@ -368,13 +368,17 @@ class CabinetPosition:
     def draw_face_view(self, scheme):
         """ Namaluje celni pohled do daneho schematu. Pohled vykresli tak,
         že střed DIN lišty umístí na počátek souřadnicového systému. """
+        # draw axe
         width = self.n_modules * Cabinet.MODULE_WIDTH
         scheme.draw_hline(-0.5 * width, 0.0, width, line='TINY')
+        # draw particular components
         scheme.push()
+        max_height = max([c.get_dimensions()[1] for c in self.content])
         scheme.move(-0.5 * width, 0.0)
         for c in self.content:
             scheme.move(0.5 * c.get_dimensions()[0], 0.0)
             c.draw_face_view(scheme)
+            scheme.canvas.text(c.label, (0, max_height))
             scheme.move(0.5 * c.get_dimensions()[0], 0.0)
         scheme.pop()
 
@@ -398,7 +402,13 @@ class Cabinet(Component):
         self.content = list([CabinetPosition(n) for n in self.n_modules])
 
     def draw_face_view(self, scheme):
+        # outer frame of the cabinet
         scheme.draw_rect(self.dimensions)
+        path = Path()
+        path.move_to((0.0, 0.0))
+        path.line_to([0.5 * d for d in self.dimensions])
+        path.transform(scheme.t)
+        path.write(scheme.canvas)
         scheme.push()
         scheme.move(0.0, (self.n_positions-1) * self.VERTICAL_CONTENT_DISTANCE * 0.5)
         for p in self.content:

@@ -65,10 +65,13 @@ class Canvas(Writable):
         sys.stdout.write(text)
 
     def move_to(self, x, y):
-        self.write('\draw ({},{})'.format(x, y))
+        self.write('\draw {}'.format(self.form_point(x, y)))
 
     def line_to(self, x, y):
-        self.write(' -- ({},{})'.format(x, y))
+        self.write(' -- {}'.format(self.form_point(x, y)))
+
+    def arc_to(self, angle1, angle2, radius):
+        self.write(' arc ({}:{}:{}{}'.format(angle1, angle2, radius, self.unit))
 
     def close_path(self):
         self.write('-- cycle;')
@@ -159,6 +162,8 @@ class Path:
             if seg[0] in ('M', 'L'):
                 x, y = transform.transform_point((seg[1], seg[2]))
                 self.path[i] = (seg[0], x, y)
+            elif seg[0] == 'A':
+                self.path[i] = (seg[0], seg[1], seg[2], transform.transform_vector((seg[3], seg[3]))[0])
 
     def write(self, canvas):
         for seg in self.path:
@@ -167,7 +172,10 @@ class Path:
             elif seg[0] == 'L':
                 canvas.line_to(seg[1], seg[2])
             elif seg[0] == 'Z':
-                canvas.close()
+                canvas.close_path()
+            elif seg[0] == 'A':
+                canvas.arc_to(seg[1], seg[2], seg[3])
+        canvas.close_path()
 
     def line_to(self, point):
         x, y = point
@@ -176,6 +184,9 @@ class Path:
     def move_to(self, point):
         x, y = point
         self.path.append(('M', x, y))
+
+    def arc_to(self, angle1, angle2, radius):
+        self.path.append(('A', angle1, angle2, radius))
 
     def close(self):
         self.path.append(('Z'))
