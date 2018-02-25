@@ -396,7 +396,7 @@ class CabinetPosition:
         """
         # draw the axis
         width = self.n_modules * Cabinet.MODULE_WIDTH
-        scheme.draw_hline(-0.5 * width, 0.0, width, line='TINY')
+        scheme.draw_hline(-0.5 * width - 2*Cabinet.MODULE_WIDTH, 0.0, width + 4*Cabinet.MODULE_WIDTH, style='axis')
         # find the size of the whole drawing
         height = max([c.get_dimensions()[1] for c in self.content])
         occupied_width = sum([c.get_dimensions()[0] for c in self.content])

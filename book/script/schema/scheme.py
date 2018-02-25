@@ -5,16 +5,17 @@ from schema.canvas import Canvas
 from schema.canvas import StandaloneCanvas
 from schema.canvas import Line
 from schema.vector import I
+from schema.symbols import EQ_TRIANGLE
 
 PAPERS = {
     'A4L' : {},
     'A4P' : {},
     'A3L' : {
-        'DRAWING_FRAME_SIZE' : (400.0, 277.0),
+        'DRAWING_FRAME_SIZE' : (410.0, 287.0),
         'GRID_FRAME_SIZE' : (420.0, 297.0),
         'OUTER_FRAME_SIZE' : (430.0, 307.0),
         'RAW_PAPER_SIZE' : (436.0, 313.0),
-        'GRID' : (3, 2)
+        'GRID' : (4, 3)
     },
     'A3P' : {
         'DRAWING_FRAME_SIZE' : (287.0, 410.0),
@@ -38,24 +39,44 @@ STYLE = {
     'aux' : {
         'line_width' : LINE_WIDTHS['TINY'],
         'line' : 'dashed',
+        'color' : None,
+        'filled' : False,
+    },
+    'tiny' : {
+        'line_width' : LINE_WIDTHS['TINY'],
+        'line' : 'solid',
+        'color' : None,
+        'filled' : False
     },
     'normal' : {
         'line_width' : LINE_WIDTHS['NORMAL'],
+        'line' : None,
+        'filled' : False,
+        'color' : None
     },
     'bold' : {
-        'line_width' : LINE_WIDTHS['NORMAL'],
+        'line_width' : LINE_WIDTHS['BOLD'],
+        'line' : None,
+        'filled' : False,
+        'color' : None
     },
     'filled' : {
+        'line_width' : LINE_WIDTHS['TINY'],
         'filled' : True,
+        'color' : None,
+        'line' : None
     },
     'warning' : {
         'line_width' : LINE_WIDTHS['TINY'],
         'line' : 'dashed',
-        'color' : 'red'
+        'color' : 'red',
+        'filled' : False
     },
     'axis' : {
         'line_width' : LINE_WIDTHS['TINY'],
-        'line' : 'dashed',
+        'line' : 'on 7mm off 0.8mm on 0.6mm off 0.8mm',
+        'filled' : False,
+        'color' : None
     }
 }
 
@@ -78,24 +99,41 @@ class Scheme:
     def pop(self):
         self.t = self.t_stack.pop()
 
-    def draw_rect(self, size, line='NORMAL'):
+    def draw_rect(self, size, line='NORMAL', style='normal'):
         self.canvas.set_line_width(LINE_WIDTHS[line])
+        self.set_style(style)
         Square(self.t.r_scale(size[0], size[1])).write(self.canvas)
+
+    def set_style(self, style):
+        style = STYLE[style]
+        if 'line_width' in style:
+            self.canvas.set_line_width(style['line_width'])
+        if 'line' in style:
+            self.canvas.set_linestyle(style['line'])
+        if 'color' in style:
+            self.canvas.set_color(style['color'])
+        if 'filled' in style:
+            self.canvas.set_fill(style['filled'])
+
+
 
     def move(self, x, y):
         self.t = self.t.r_move(x, y)
 
-    def draw_hline(self, x, y, size, line='NORMAL'):
+    def draw_hline(self, x, y, size, line='NORMAL', style='normal'):
         self.canvas.set_line_width(LINE_WIDTHS[line])
+        self.set_style(style)
         Line(((x, y), (x+size, y)), self.t).write(self.canvas)
 
-    def draw_vline(self, x, y, size, line='NORMAL'):
+    def draw_vline(self, x, y, size, line='NORMAL', style='normal'):
         self.canvas.set_line_width(LINE_WIDTHS[line])
+        self.set_style(style)
         Line(((x, y), (x, y+size)), self.t).write(self.canvas)
 
-    def draw_circle(self, radius, cx=0.0, cy=0.0):
+    def draw_circle(self, radius, cx=0.0, cy=0.0, style='normal'):
         c = self.t.transform_point((cx, cy))
         r = self.t.transform_vector((radius, radius))[0]
+        self.set_style(style)
         self.canvas.circle(c[0], c[1], r)
 
     def draw_hdimension(self, points, y):
@@ -156,7 +194,7 @@ class Scheme:
         grid_frame_size = self.paper['GRID_FRAME_SIZE']
         outer_frame_size = self.paper['OUTER_FRAME_SIZE']
         self.draw_rect(outer_frame_size, 'TINY') # draw outer frame
-        self.draw_rect(grid_frame_size, 'TINY')  #
+        self.draw_rect(grid_frame_size, style='tiny')  #
         self.draw_rect(drawing_frame_size)
         # draw center marks
         x, y = grid_frame_size
@@ -166,6 +204,9 @@ class Scheme:
         self.draw_hline(-x, 0, size)
         self.draw_vline(0, y, -size)
         self.draw_vline(0, -y, size)
+        # center triangles
+        Line(EQ_TRIANGLE, self.t.r_move(x-5.0, 0.0).r_scale(-5.0, 5.0)).write(self.canvas)
+        Line(EQ_TRIANGLE, self.t.r_move(0.0, -y+5.0).r_scale(-5.0, 5.0).rotate_vect()).write(self.canvas)
         # draw grid
         y = 0.5 * grid_frame_size[1]
         hgrid, vgrid = self.paper['GRID']
@@ -228,6 +269,7 @@ class Scheme:
         x = 0.5 * grid_frame_size[0]
         y = 0.5 * grid_frame_size[1]
         self.canvas.set_line_width(LINE_WIDTHS['TINY'])
+        self.canvas.set_fill(True)
         Line(cut_points, self.t.r_move(-x, -y)).write(self.canvas)
         Line(cut_points, self.t.r_scale(1.0, -1.0).r_move(-x, -y)).write(self.canvas)
         Line(cut_points, self.t.r_scale(-1.0, 1.0).r_move(-x, -y)).write(self.canvas)
@@ -239,31 +281,56 @@ class Scheme:
             0.5 * (drawing_frame_size[0] - DESC_FIELD_SIZE[0]),
             0.5 * (DESC_FIELD_SIZE[1] - drawing_frame_size[1])
         )
-        self.draw_rect(DESC_FIELD_SIZE)
+        self.draw_rect(DESC_FIELD_SIZE, style='bold')
         if self.description is not None:
             # Cislo vykresu
             if 'number' in self.description:
                 self.canvas.text(
                     self.description['number'],
-                    self.t.transform_point((0, 0)),
+                    self.t.transform_point((0.0, -10.0)),
                     size='huge'
                 )
             # Nazev vykresu
             if 'name' in self.description:
                 self.canvas.text(
                     self.description['name'],
-                    self.t.transform_point((0, -10)),
+                    self.t.transform_point((0.0, 0.0)),
                     size='huge'
                 )
-        # List / listu
-        # Projekt
-        # Realizator
-        # projektant
-        # schvalil
-        # nakreslil
-        # datum
-        # meritko
-        # zmenove pole
+            head = list()
+            text = list()
+            # Projekt
+            # Realizator
+            # projektant
+            # schvalil
+            # nakreslil
+            if 'author' in self.description:
+                head.append('\\hfill{{}}Autor:')
+                text.append(self.description['author'])
+            # datum
+            if 'date' in self.description:
+                head.append('\\hfill{{}}Datum:')
+                text.append(self.description['date'])
+            # meritko
+            if 'scale' in self.description:
+                head.append('\\hfill{{}}Měřítko:')
+                text.append(self.description['scale'])
+            # List / listu
+            if 'page' in self.description:
+                head.append('\\hfill{{}}List:')
+                text.append(self.description['page'])
+            # zmenove pole
+            if text:
+                self.canvas.text(
+                    '\\\\'.join(head),
+                    self.t.transform_point((-0.5*(DESC_FIELD_SIZE[0]-15.0), 0.0)),
+                    width=15.0
+                )
+                self.canvas.text(
+                    '\\\\'.join(text),
+                    self.t.transform_point((-0.5*(DESC_FIELD_SIZE[0]-30.0)+17.0, 0.0)),
+                    width=30.0
+                )
         self.pop()
         # Move drawing coordinates
         self.move(0.0, 0.5 * DESC_FIELD_SIZE[1])

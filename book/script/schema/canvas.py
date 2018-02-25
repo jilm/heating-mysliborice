@@ -47,12 +47,24 @@ class Canvas(Writable):
         self.opened = False
         self.closed = False
         self.line_width = 0.4
+        self.color = None
+        self.linestyle = None
+        self.fill = False
 
     def __str__(self):
         return 'This is a Canvas instance, opened: {}, closed: {}'.format(self.opened, self.closed)
 
     def set_line_width(self, width):
         self.line_width = width
+
+    def set_color(self, color):
+        self.color = color
+
+    def set_linestyle(self, style):
+        self.linestyle = style
+
+    def set_fill(self, fill):
+        self.fill = fill
 
     def open(self):
         """ It is called before the first character is written on the output. """
@@ -90,7 +102,7 @@ class Canvas(Writable):
         """
         form = ('({0}{2},{1}{2})'.format(x, y, self.unit) for x, y in points)
         concat = functools.reduce(lambda a, b: '{} -- {}'.format(a, b), form)
-        self.write('\draw[{1}] {0};'.format(concat, self.form_draw_params()))
+        self.write('\draw {1} {0};'.format(concat, self.form_draw_params()))
 
     def closed_line(self, points):
         """
@@ -100,21 +112,26 @@ class Canvas(Writable):
         """
         form = ('({0}{2},{1}{2})'.format(x, y, self.unit) for x, y in points)
         concat = functools.reduce(lambda a, b: '{} -- {}'.format(a, b), form)
-        self.write('\draw[{1}] {0} -- cycle;'.format(concat, self.form_draw_params()))
+        self.write('\draw {1} {0} -- cycle;'.format(concat, self.form_draw_params()))
 
-    def text(self, text, point, position=None, size=None):
+    def text(self, text, point, position=None, size=None, width=None):
         """Draw given text at given position."""
         x, y = point
+        params = list()
         if position is not None:
-            anchor = 'anchor={}'.format(text_positions[position])
-        else:
-            anchor = ''
+            params.append('anchor={}'.format(text_positions[position]))
+        if width is not None:
+            params.append('text width={}{}'.format(width, self.unit))
         if size is not None and size in TEXT_SIZE:
             size_value = TEXT_SIZE[size]
         else:
             size_value = ''
-        self.write('\draw {0} node[{1}] {{{2} {3}}};'.format(
-            self.form_point(x, y), anchor, size_value, text))
+        if params:
+            str_params = '[{}]'.format(','.join(params))
+        else:
+            str_params = ''
+        self.write('\draw {0} node{1} {{{2} {3}}};'.format(
+            self.form_point(x, y), str_params, size_value, text))
 
 
     def rect(self, x, y, width, height):
@@ -137,7 +154,22 @@ class Canvas(Writable):
     def form_draw_params(self):
         """ For internal use, it returns tikz string representation of the
         draw parameters. """
-        return 'line width={}{}'.format(self.line_width, self.unit)
+        params = list()
+        if self.line_width is not None:
+            params.append('line width={}{}'.format(self.line_width, self.unit))
+        if self.color is not None:
+            params.append('color={}'.format(self.color))
+        if self.fill:
+            params.append('fill')
+        if self.linestyle is not None:
+            if self.linestyle in ('dashed', 'solid'):
+                params.append(self.linestyle)
+            else:
+                params.append('dash pattern={}'.format(self.linestyle))
+        if params:
+            return '[{}]'.format(','.join(params))
+        else:
+            return ''
 
 
 #canvas = Canvas()
