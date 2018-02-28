@@ -5,7 +5,7 @@ from schema.canvas import Canvas, Line, Circle, Square, Path
 from schema.scheme import Scheme
 import itertools
 from schema.symbols import EQ_TRIANGLE_H
-
+import schema.elsymbol
 
 """   Třídy použitých komponent. """
 
@@ -85,6 +85,8 @@ class PT100W4(Component):
     def __init__(self, label):
         super().__init__(label)
 
+    def draw_electrical_symbol(self, scheme):
+        schema.elsymbol.draw_temp_sensor(scheme)
 
 class Terminal(Component, DINAssembly):
 
