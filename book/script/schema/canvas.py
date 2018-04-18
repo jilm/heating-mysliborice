@@ -187,6 +187,7 @@ class StandaloneCanvas(Canvas):
         self.write('\\documentclass{article}')
         self.write('\\usepackage{tikz}')
         self.write('\\usepackage[paperwidth={}mm, paperheight={}mm, left=0.3cm, right=0.3cm, top=0.3cm, bottom=0.3cm, hoffset=0cm]{{geometry}}'.format(self.paper_size[0], self.paper_size[1]))
+        self.write('\\usepackage[utf8]{{inputenc}}')
         self.write('\\begin{document}')
         self.write('\\noindent\\begin{tikzpicture}')
 

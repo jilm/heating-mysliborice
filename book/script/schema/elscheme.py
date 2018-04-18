@@ -11,7 +11,7 @@ from schema.scheme import Scheme
 class ElectroScheme(Scheme):
 
     """ The layer of the electric scheme. It is dedicated to help you to
-    draw an scheme according to the habits in this field. It should work
+    draw a scheme according to the habits in this field. It should work
     like this. You put some component, or a group of components and it
     helps you to place an draw a wires between those components. """
 

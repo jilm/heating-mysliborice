@@ -24,11 +24,14 @@ comp.PT100W4(
     label = '=HP-BTH'
 )
 
-
 # Převodník na proudovou smyčku pro PT100 =HP-BTH
 comp.P5310(
     label = '-B3',
 )
+
+# Connect -B3 together with the temperature sensor
+#Thermistor4WConverterConnection(....)
+#schema.put(Thermistor....)
 
 # Senzor teploty v obývacím pokoji v podkroví
 comp.TQS3(
