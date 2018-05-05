@@ -6,6 +6,7 @@ from schema.vector import Transform, Rect
 
 S = 6.0 # minimal distance between two parallel wires
 
+
 # equilateral_triangle
 EQ_TRIANGLE_H = 0.866 # height of the triangle
 EQ_TRIANGLE_R = 0.289 # The radius of the inscribed circle

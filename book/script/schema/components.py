@@ -6,6 +6,7 @@ from schema.scheme import Scheme
 import itertools
 from schema.symbols import EQ_TRIANGLE_H
 import schema.elsymbol
+import schema.resistor
 
 """   Třídy použitých komponent. """
 
@@ -85,8 +86,10 @@ class PT100W4(Component):
     def __init__(self, label):
         super().__init__(label)
 
-    def draw_electrical_symbol(self, scheme):
-        schema.elsymbol.draw_temp_sensor(scheme)
+    def draw_electrical_symbol(self, canvas):
+        schema.resistor.draw_resistor_base(canvas)
+        schema.resistor.draw_thermistor_var(canvas)
+        schema.resistor.draw_pin4(canvas)
 
 class Terminal(Component, DINAssembly):
 
@@ -141,7 +144,9 @@ class P5310(Component, DINAssembly):
     def write_block_symbol(self):
         pass
 
-    def write_schema_symbol(self):
+    def write_schema_symbol(self, schema):
+        schema.draw_rect()
+
         pass
 
     def write_front_view(self):

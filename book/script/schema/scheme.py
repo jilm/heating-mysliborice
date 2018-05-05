@@ -7,6 +7,8 @@ from schema.canvas import Line
 from schema.vector import I
 from schema.symbols import EQ_TRIANGLE
 
+""" A scheme is just a device independent canvas. """
+
 PAPERS = {
     'A4L' : {},
     'A4P' : {},
