@@ -7,6 +7,7 @@ from schema.canvas import Line
 from schema.vector import I
 from schema.symbols import EQ_TRIANGLE
 from schema.scheme import Scheme
+import schema.scheme
 
 class ElectroScheme:
 
@@ -31,6 +32,7 @@ class ElectroScheme:
         #self.t = self.t.r_scale(2.84526)
         #self.handlers = {}
         self.canvas = canvas
+        self.row = schema.scheme.clip_top(self.canvas, 20.0)
         pass
 
     def write_ref(self, handle, text = ''):
@@ -47,8 +49,17 @@ class ElectroScheme:
         return handle
 
     def draw_component(self, component, label):
-        component.draw_electrical_symbol(self.canvas)
+        component.draw_electrical_symbol(self.row)
         #component = get_component(label)
         #_ = component.draw_el_symbol(self)
         #self.put(label, _)
         pass
+
+    def step(self, x=0, y=0):
+        self.row = self.row.move((x, y))
+
+
+    def draw_h_mwire(self, left, right):
+        pass
+
+    def draw_h_wire(self, index_left, index_right):

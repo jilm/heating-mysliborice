@@ -82,6 +82,129 @@ STYLE = {
     }
 }
 
+class LocalScheme:
+
+    """ It allows to change coordinates before the next part of the schema
+    is drawn."""
+
+    def __init__(self, canvas, t, clip_region):
+        self.clip_region = clip_region
+        self.t = t
+        self.canvas = canvas
+        # debug
+        self.draw_line((clip_region.lb_point, clip_region.rt_point), style='grid')
+
+    def draw_rect(self, width, height, offset=(0.0, 0.0), style=None):
+        w, h = self.t.transform_vector((width, height))
+        self.canvas.draw_rect(
+            w, h,
+            offset=self.t.transform_point(offset),
+            style=style
+        )
+
+    def draw_line(self, points, style=None):
+        _ = self.t.transform_points(points)
+        self.canvas.draw_line(_, style)
+
+    def draw_hline(self, x, y, size, style=None):
+        self.draw_line((
+                (x, y),
+                (x + size, y)
+            ),
+            style = style
+        )
+
+    def draw_vline(self, x, y, size, style=None):
+        self.draw_line((
+                (x, y),
+                (x, y + size)
+            ),
+            style = style
+        )
+
+    def text(self, text, point, size=None, position=None):
+        self.canvas.text(
+            text=text,
+            point=self.t.transform_point(point),
+            size=size,
+            position=position
+        )
+
+    def move(self, offset):
+        return LocalScheme(
+            self,
+            t=I.r_move(*offset),
+            clip_region=self.clip_region.move(offset)
+        )
+
+    def move_to(self, point):
+        return self.move((
+            point[0] - self.clip_region.lb_point[0],
+            point[1] - self.clip_region.lb_point[1]
+        ))
+
+class ClipRegion:
+
+    def __init__(self, lb_point, rt_point):
+        self.lb_point = lb_point
+        self.rt_point = rt_point
+
+    def margins(self, margin):
+        return ClipRegion(
+            ((self.lb_point[0] + margin), (self.lb_point[1] + margin)),
+            ((self.rt_point[0] - margin), (self.rt_point[1] - margin))
+        )
+
+    def move(self, offset):
+        return ClipRegion(
+            ((self.lb_point[0] - offset[0]), (self.lb_point[1] - offset[1])),
+            ((self.rt_point[0] - offset[0]), (self.rt_point[1] - offset[1]))
+        )
+
+    def get_size(self):
+        return (
+            self.rt_point[0]-self.lb_point[0],
+            self.rt_point[1]-self.lb_point[1]
+        )
+
+    def get_rb_point(self):
+        return (
+            self.rt_point[0],
+            self.lb_point[1]
+        )
+
+def centr_origin(canvas):
+    return canvas.move_to([0.5 * d for d in canvas.clip_region.get_size()])
+
+def rb_origin(canvas):
+    return canvas.move_to((
+        canvas.clip_region.rt_point[0],
+        canvas.clip_region.lb_point[1]
+    ))
+
+def clip_rb(canvas, width, height):
+    return LocalScheme(
+        canvas=canvas,
+        t=I.r_move(*canvas.clip_region.get_rb_point()).r_move(-0.5*width, 0.5*height),
+        clip_region=ClipRegion((-0.5*width, -0.5*height), (0.5*width, 0.5*height))
+    )
+
+def clip_margins(canvas, left=0.0, top=0.0, right=0.0, bottom=0.0):
+    width, height = canvas.clip_region.get_size()
+    width -= left + right
+    height -= top + bottom
+    return LocalScheme(
+        canvas=canvas,
+        t=I.r_move(*canvas.clip_region.lb_point)\
+            .r_move(left, bottom)\
+            .r_move(0.5*width, 0.5*height),
+        clip_region=ClipRegion((-0.5*width, -0.5*height), (0.5*width, 0.5*height))
+    )
+
+def clip_top(canvas, height):
+    w, h = canvas.clip_region.get_size()
+    return clip_margins(canvas, bottom=h-height)
+
 class Scheme:
 
     def __init__(self, canvas, paper='A3L', description=None):

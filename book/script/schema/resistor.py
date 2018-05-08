@@ -52,3 +52,4 @@ def draw_thermistor_block(canvas):
     #canvas.line(vector.Rect())
     pass
 
+

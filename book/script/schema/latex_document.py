@@ -1,39 +1,84 @@
 # -*- coding: utf-8 -*-
 
-from schema.scheme import PAPERS
+from schema.paper import PAPERS
 from schema.vector import I
 from schema.style import STYLE
 from schema.style import form_tikz_style
+from schema.scheme import LocalScheme
+from schema.scheme import ClipRegion
+import sys
 
-""" It writes necessary latex document envelope. """
+""" Latex and Tikz document drivers. """
+
+PAPER_MARGINS = 3.0 # mm
+
+class Latex:
+
+    """ It represents the lowest layer; the Latex document. """
+
+    def __init__(self):
+        """ Requires a file to write the otput. """
+        self.environment_stack = []
+
+    def is_opened(self):
+        return True if self.environment_stack else False
+
+    def write_text(self, text):
+        sys.stdout.write(text)
+
+    def write_command(self, command, arg1=None, args=None):
+        str_arg1 = '' if arg1 is None else '[{0}]'.format(str(arg1))
+        str_args = '' if args is None else '}{'.join([str(arg) for arg in args])
+        self.write_text('\\{0}{1}{{{2}}}'.format(command, str_arg1, str_args))
+
+    def open_environment(self, environment):
+        self.write_command('begin', args=[environment])
+        self.environment_stack.append(environment)
+
+    def close_last_environment(self):
+        if self.is_opened():
+            self.write_command('end', args=[self.environment_stack.pop()])
+
+    def close(self):
+        while self.is_opened():
+            self.close_last_environment()
+
+    def form_params(self, param_dict):
+        return ','.join(
+            ['{}={}'.format(key, param_dict[key]) for key in param_dict.keys()]
+        )
 
 class LatexDocument:
 
-    """ It represents the lowes layer of the Latex document. """
+    """ It represents the lowest layer; the Latex document. """
 
-    def __init__(self, file, paper='A3L'):
+    def __init__(self, file, raw_paper_size):
+
         """ Requires a file to write the otput. """
+
         self.file = file
         self.environment_stack = []
-        self.paper = PAPERS[paper]
+        self.raw_paper_size = raw_paper_size
         #self.open()
 
     def is_opened(self):
         return True if self.environment_stack else False
 
     def open(self):
+
         """ Write necessary latex document header into the file. """
+
         self.write_command('documentclass', args=['article'])
         self.write_command('usepackage', args=['tikz'])
         self.write_command('usepackage', args=['geometry'])
         #self.file.write('\\usepackage[paperwidth={}mm, paperheight={}mm, left=0.3cm, right=0.3cm, top=0.3cm, bottom=0.3cm, hoffset=0cm]{{geometry}}\n'.format(self.paper_size[0], self.paper_size[1]))
         self.write_command('usepackage', arg1='utf8', args=['inputenc'])
         geometry_params = {
-            'paperwidth' : '{0}mm'.format(self.paper['RAW_PAPER_SIZE'][0]),
-            'paperheight' : '{0}mm'.format(self.paper['RAW_PAPER_SIZE'][1]),
-            'top' : '0mm',
+            'paperwidth' : '{0}mm'.format(self.raw_paper_size[0]),
+            'paperheight' : '{0}mm'.format(self.raw_paper_size[1]),
+            'top' : '{0}mm'.format(PAPER_MARGINS),
             'bottom' : '0mm',
-            'left' : '0mm',
+            'left' : '{0}mm'.format(PAPER_MARGINS),
             'right' : '0mm',
         }
         self.write_command('geometry', args=([self.form_params(geometry_params)]))
@@ -45,7 +90,7 @@ class LatexDocument:
     def write_command(self, command, arg1=None, args=None):
         str_arg1 = '' if arg1 is None else '[{0}]'.format(str(arg1))
         str_args = '' if args is None else '}{'.join([str(arg) for arg in args])
-        self.file.write('\\{0}{1}{{{2}}}'.format(command, str_arg1, str_args))
+        self.write_text('\\{0}{1}{{{2}}}'.format(command, str_arg1, str_args))
 
     def open_environment(self, environment):
         self.write_command('begin', args=[environment])
@@ -65,15 +110,24 @@ class LatexDocument:
         )
 
     def get_size(self):
-        return self.paper['OUTER_FRAME_SIZE']
+        return (
+            self.raw_paper_size[0] - 2 * PAPER_MARGINS,
+            self.raw_paper_size[1] - 2 * PAPER_MARGINS
+        )
+
+    def begin_tikz(self):
+        tikz = Tikz(self, self.get_size())
+        tikz.open()
+        return tikz
 
 class Tikz:
 
     """ Encapsulates a Tikz environment. """
 
-    def __init__(self, latex_document):
+    def __init__(self, latex_document, size):
         self.document = latex_document
         self.unit = 'mm'
+        self.clip_region = ClipRegion((0.0, 0.0), size)
 
     def open(self):
         self.document.write_command('noindent')
@@ -85,30 +139,52 @@ class Tikz:
     def close(self):
         self.document.close_last_environment()
 
-    def draw_line(self, points, params=None, closed=False, style=None):
+    def draw_line(self, points, style=None):
+
         """
         Draw strait line between all of the given points.
         Points must be given in the form of collection of x, y tuples.
         """
-        _ = ' -- '.join(
-            ['({0}{2},{1}{2})'.format(x, y, self.unit) for x, y in points]
-        )
+
+        path = TikzPathBuilder()
+        for p in points:
+            path.line_to(p)
         self.document.write_command('draw', arg1=style)
-        self.document.write_text(_)
+        self.document.write_text(str(path))
         self.document.write_text(';')
 
-    def draw_rect(self, point1, point2, style=None):
-        path = TikzPathBuilder(point1)
-        path.rectangle_to(point2)
+    def draw_hline(self, x, y, size, style=None):
+        self.draw_line((
+                (x, y),
+                (x + size, y)
+            ),
+            style = style
+        )
+
+    def draw_vline(self, x, y, size, style=None):
+        self.draw_line((
+                (x, y),
+                (x, y + size)
+            ),
+            style = style
+        )
+
+    def draw_rect(self, width, height, offset=(0.0, 0.0), style=None):
+        lt_point = (-0.5 * width + offset[0], -0.5 * height + offset[1])
+        rb_point = (0.5 * width + offset[0], 0.5 * height + offset[1])
+        path = TikzPathBuilder(lt_point)
+        path.rectangle_to(rb_point)
         self.document.write_command('draw', arg1=style)
         self.document.write_text(str(path))
         self.document.write_text(';')
 
     def get_size(self):
-        return self.document.get_size()
+        return self.clip_region.get_size()
 
-    def text(self, text, point, position=None, size=None, width=None, style=None):
+    def text(self, text, point, size=None, position=None, style=None):
+
         """Draw given text at given position."""
+
         x, y = point
         path = TikzPathBuilder(point)
         path.node(text)
@@ -128,6 +204,13 @@ class Tikz:
         self.document.write_command('draw', arg1=style)
         self.document.write_text(str(path))
         self.document.write_text(';')
+
+    def move(self, offset=(0.0, 0.0)):
+        return LocalScheme(
+            canvas=self,
+            t=I.r_move(*offset),
+            clip_region=self.clip_region
+        )
 
 class TikzPathBuilder:
 

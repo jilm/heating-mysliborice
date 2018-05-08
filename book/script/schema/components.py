@@ -7,6 +7,7 @@ import itertools
 from schema.symbols import EQ_TRIANGLE_H
 import schema.elsymbol
 import schema.resistor
+import schema.converter
 
 """   Třídy použitých komponent. """
 
@@ -148,6 +149,9 @@ class P5310(Component, DINAssembly):
         schema.draw_rect()
 
         pass
+
+    def draw_electrical_symbol(self, canvas):
+        schema.converter.draw_converter_base(canvas, height = 5)
 
     def write_front_view(self):
         pass

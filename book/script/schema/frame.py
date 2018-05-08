@@ -2,22 +2,29 @@
 
 from schema.symbols import EQ_TRIANGLE
 from schema.vector import I
+from schema.scheme import LocalScheme
+import schema.scheme
 
 """ Draw a frame on the schema object. """
 
 GRID_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p']
 GRID_NUMBERS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+DESC_FIELD_SIZE = (170.0, 50.0)
 
-def draw_frame(schema, geometry):
+def draw_frame(canvas, geometry):
+
+    """ It draw a scheme frame on the given schema. """
+
     #raw_size=canvas.get_size()
     # Vykresovy list
     drawing_frame_size = geometry['DRAWING_FRAME_SIZE']
     grid_frame_size = geometry['GRID_FRAME_SIZE']
     outer_frame_size = geometry['OUTER_FRAME_SIZE']
-    schema.move_to(schema.get_center())
+    schema = canvas.move([0.5 * d for d in canvas.clip_region.get_size()])
     schema.draw_rect(*outer_frame_size, style='tiny') # draw outer frame
     schema.draw_rect(*grid_frame_size, style='tiny')  #
     schema.draw_rect(*drawing_frame_size, style='normal')
+    frame_margin = 0.5 * (outer_frame_size[0] - drawing_frame_size[0])
     # draw center marks
     x, y = grid_frame_size
     x, y = 0.5 * x, 0.5 * y
@@ -99,4 +106,27 @@ def draw_frame(schema, geometry):
     schema.draw_line(I.r_scale(-1.0, 1.0).r_move(-x, -y).transform_points(cut_points))
     schema.draw_line(I.r_scale(-1.0, -1.0).r_move(-x, -y).transform_points(cut_points))
 
-    return
+    return LocalScheme(schema, I.r_move(frame_margin, frame_margin), schema.clip_region.margins(frame_margin).move((frame_margin,frame_margin)))
+
+
+def draw_description_field(canvas, description):
+
+    """ Draw a descripton field on the given canvas.
+
+    The description field is always situated on the right bottom corner
+    of the schema. So, it is expected, that, the coordinate origin is set
+    to the right, bottom corner of the given canvas. """
+
+    canvas = schema.scheme.clip_rb(canvas, *DESC_FIELD_SIZE)
+    canvas.draw_rect(*DESC_FIELD_SIZE, style='bold')
+    if description is not None:
+        # Cislo vykresu
+        if 'number' in description:
+            canvas.text(
+                text=description['number'],
+                point=(0.0, -10.0),
+                size='huge'
+            )
+
+
+    pass

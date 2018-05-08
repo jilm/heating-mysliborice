@@ -53,7 +53,7 @@ STYLE = {
 
     'grid' : {
         'line width' : LINE_WIDTHS['TINY'],
-        'color' : 'gray'
+        'color' : 'red'
     }
 }
 
